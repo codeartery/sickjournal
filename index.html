@@ -10,12 +10,20 @@
     
     <main>
         <header>
-            <span class="days-sick-label">Day </span><span class="days-sick-value" id="daysSickValue">4</span>
+            <span class="days-sick-label">Day </span><span class="days-sick-value" id="daysSickValue">0</span>
             <span class="last-sick">
                 <span class="last-sick-label">Last Sick: </span><span class="last-sick-value" id="lastSickValue">2022-05-02</span>
             </span>
         </header>
-        <div>Current content</div>
+        <div class="content">
+            <div class="content-body">
+                <span class="material-symbols-outlined">sentiment_very_satisfied</span>
+            </div>
+            <div class="content-footer">
+                <input type="button" name="wasSick" value="I was sick" />
+                <input type="button" name="amSick" value="I feel sick" />
+            </div>
+        </div>
     </main>
     <nav>
         <a href="./index.html" class="active-nav"><span class="material-symbols-outlined">thermostat</span></a>

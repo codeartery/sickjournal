@@ -1,3 +1,12 @@
+:root {
+    --color-bg: #222;
+    --color-fg: #ccc;
+    --color-ba: #000;
+    --color-fa: #fff;
+    --color-pa: #b00020;
+    --color-sa: yellow;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -11,10 +20,11 @@ body {
     
     font-family: Arial;
     text-transform: uppercase;
+    color: var(--color-fg);
 }
 
 main {
-    background-color: #ccc;
+    background-color: var(--color-bg);
 }
 
 nav {
@@ -24,16 +34,17 @@ nav {
     place-items: center;
     
     height: 50px;
-    background-color: #eee;
+    background-color: var(--color-ba);
 }
 
 nav > a {
     padding: 10px 20px;
     border-radius: 5px;
     text-decoration: none;
-    color: black;
+    color: var(--color-pa);
 }
 
 a.active-nav {
-    background-color: #ddd;
+    background-color: var(--color-pa);
+    color: var(--color-fg);
 }

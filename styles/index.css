@@ -3,7 +3,7 @@ header {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr min-content;
     place-items: center;
-    background-color: #eee;
+    background-color: var(--color-ba);
     padding: 20px 5px 0px 5px;
     border-radius: 0 0 20px 20px;
 }
@@ -20,7 +20,7 @@ header > .days-sick-value {
     grid-row: 1;
     grid-column: 2;
     justify-self: center;
-    color: red;
+    color: var(--color-pa);
     font-size: 3rem;
     font-weight: 800;
 }
@@ -34,5 +34,39 @@ header > .last-sick {
 }
 
 header > .last-sick > .last-sick-label {
-    color: #555;
+    color: var(--color-fg);
+}
+
+.content {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr min-content;
+    place-items: center;
+}
+
+.content-body > span {
+    font-size: 8rem;
+    padding: 60px;
+}
+
+.content-footer > input {
+    margin: 0 10px;
+    padding: 10px 30px;
+    background-color: var(--color-fg);
+    color: var(--color-ba);
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+}
+
+.content-footer > input:first-child {
+    background-color: var(--color-ba);
+    color: var(--color-fg);
+}
+
+.content-footer > input:last-child {
+    background-color: var(--color-pa);
+    color: var(--color-fg);
 }
