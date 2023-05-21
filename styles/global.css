@@ -1,0 +1,39 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr min-content;
+    
+    font-family: Arial;
+    text-transform: uppercase;
+}
+
+main {
+    background-color: #ccc;
+}
+
+nav {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
+    grid-template-rows: 1fr;
+    place-items: center;
+    
+    height: 50px;
+    background-color: #eee;
+}
+
+nav > a {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: black;
+}
+
+a.active-nav {
+    background-color: #ddd;
+}

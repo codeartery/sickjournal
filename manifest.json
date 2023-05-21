@@ -4,5 +4,5 @@
   "start_url": ".",
   "display": "standalone",
   "background_color": "#fff",
-  "description": "An app to track and log when you get sick."
+  "description": "An offline PWA for journaling sickness."
 }
