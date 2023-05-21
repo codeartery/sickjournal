@@ -10,23 +10,87 @@
     
     <main>
         <header>
-            <span class="days-sick-label">Day </span><span class="days-sick-value" id="daysSickValue">0</span>
+            <span class="days-sick-label">Day </span><span class="days-sick-value" id="daysSickValue">7</span>
             <span class="last-sick">
                 <span class="last-sick-label">Last Sick: </span><span class="last-sick-value" id="lastSickValue">2022-05-02</span>
             </span>
         </header>
-        <div class="content">
-            <div class="content-body">
-                <span class="material-symbols-outlined">sentiment_very_satisfied</span>
+        <section id="goodUI">
+            <div class="layout layout-row2 layout-center">
+                <div class="layout layout-row2 layout-center">
+                    <span class="mood-image material-symbols-outlined">sentiment_very_satisfied</span>
+                    <span class="mood-label">sick free!</span>
+                </div>
+                <div class="p1">
+                    <div class="layout layout-col2 layout-gap">
+                        <input type="button" name="old" value="i was sick" />
+                        <input type="button" name="new" value="i feel sick" />
+                    </div>
+                </div>
             </div>
-            <div class="content-footer">
-                <input type="button" name="wasSick" value="I was sick" />
-                <input type="button" name="amSick" value="I feel sick" />
+        </section>
+        
+        <section id="sickUI" class="p2">
+            <div class="container">
+                <div class="layout layout-col3 layout-center">
+                    <div class="layout layout-row2 layout-center mood mood-active">
+                        <span class="mood-image material-symbols-outlined">sentiment_dissatisfied</span>
+                        <span class="mood-label">worse</span>
+                    </div>
+                    <div class="layout layout-row2 layout-center mood">
+                        <span class="mood-image material-symbols-outlined">sentiment_neutral</span>
+                        <span class="mood-label">same</span>
+                    </div>
+                    <div class="layout layout-row2 layout-center mood">
+                        <span class="mood-image material-symbols-outlined">sentiment_satisfied</span>
+                        <span class="mood-label">better</span>
+                    </div>
+                </div>                
+                <div class="container pt2">
+                    <div class="layout layout-col2 layout-gap">
+                        <input type="button" name="cancel" value="False alarm" />
+                        <input type="button" name="save" value="All better" />
+                    </div>
+                </div>
             </div>
-        </div>
+            
+            <div class="p1 pt2">
+                <div class="rows layout layout-col2 layout-center">
+                    <span class="row-header">symptoms</span>
+                    <span class="row-image material-symbols-outlined">add</span>
+                </div>
+                <div class="rows layout layout-col2 layout-center">
+                   <span class="row-label">cough</span>
+                   <span class="row-image material-symbols-outlined">delete</span>
+               </div>
+               <div class="rows layout layout-col2 layout-center">
+                   <span class="row-label">sore throat</span>
+                   <span class="row-image material-symbols-outlined">delete</span>
+               </div>
+               <div class="rows layout layout-col2 layout-center">
+                   <span class="row-label">weak</span>
+                   <span class="row-image material-symbols-outlined">delete</span>
+               </div>
+            </div>
+            
+            <div class="p1 pt2">
+                <div class="rows layout layout-col2 layout-center">
+                    <span class="row-header">medications</span>
+                    <span class="row-image material-symbols-outlined">add</span>
+                </div>
+                <div class="rows layout layout-col2 layout-center">
+                   <span class="row-label">dayquill</span>
+                   <span class="row-image material-symbols-outlined">delete</span>
+               </div>
+               <div class="rows layout layout-col2 layout-center">
+                   <span class="row-label">nyquill</span>
+                   <span class="row-image material-symbols-outlined">delete</span>
+               </div>
+           </div>
+        </section>
     </main>
     <nav>
-        <a href="./index.html" class="active-nav"><span class="material-symbols-outlined">thermostat</span></a>
+        <a href="./index.html" class="nav-active"><span class="material-symbols-outlined">thermostat</span></a>
         <a href="./pages/history.html"><span class="material-symbols-outlined">auto_stories</span></a>
         <a href="./pages/settings.html"><span class="material-symbols-outlined">settings</span></a>
     </nav>

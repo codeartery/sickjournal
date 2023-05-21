@@ -37,36 +37,69 @@ header > .last-sick > .last-sick-label {
     color: var(--color-fg);
 }
 
-.content {
-    display: grid;
-    grid-gap: 20px;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr min-content;
-    place-items: center;
+#goodUI {
+    display: none;
 }
 
-.content-body > span {
-    font-size: 8rem;
-    padding: 60px;
+#sickUI {
+    display: block;
 }
 
-.content-footer > input {
-    margin: 0 10px;
-    padding: 10px 30px;
-    background-color: var(--color-fg);
-    color: var(--color-ba);
+#sickUI input {
+    padding: 10px 20px;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;    
+}
+
+#goodUI input {
+    padding: 10px 20px;
+    background-color: var(--color-ba);
+    color: var(--color-fg);
     text-transform: uppercase;
     font-weight: bold;
     cursor: pointer;
     border: none;
 }
 
-.content-footer > input:first-child {
-    background-color: var(--color-ba);
-    color: var(--color-fg);
+#goodUI input:last-child {
+    background-color: var(--color-pa);
 }
 
-.content-footer > input:last-child {
+.mood {
+    cursor: pointer;
+}
+
+#goodUI .mood-image {
+    font-size: 8rem;
+    padding: 60px;
+    padding-bottom: 10px;
+}
+
+#goodUI .mood-label {
+    font-size: 0.8rem;
+    font-weight: 900;
+    padding-bottom: 50px;
+}
+
+#sickUI .mood-image {
+    font-size: 3rem;
+    padding: 10px 0px;
+}
+
+#sickUI .mood-label {
+    font-size: 0.7rem;
+    font-weight: 900;
+}
+
+#sickUI .mood {
+    border-radius: 10px;
+    padding: 5px 15px;
+}
+
+#sickUI .mood-active {
     background-color: var(--color-pa);
-    color: var(--color-fg);
 }

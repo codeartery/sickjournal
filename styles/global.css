@@ -20,21 +20,24 @@ body {
     
     font-family: Arial;
     text-transform: uppercase;
+    background-color: var(--color-bg);
     color: var(--color-fg);
 }
 
 main {
     background-color: var(--color-bg);
+    
 }
 
 nav {
     display: grid;
     grid-template-columns: 2fr 1fr 2fr;
-    grid-template-rows: 1fr;
     place-items: center;
-    
+    position: sticky;
+    bottom: 0;
     height: 50px;
     background-color: var(--color-ba);
+    border-radius: 5px 5px 0px 0px;
 }
 
 nav > a {
@@ -44,7 +47,74 @@ nav > a {
     color: var(--color-pa);
 }
 
-a.active-nav {
+a.nav-active {
     background-color: var(--color-pa);
     color: var(--color-fg);
+}
+
+.layout {
+    display: grid;
+}
+
+.layout-center {
+    place-items: center;
+}
+
+.layout-col3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.layout-col2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.layout-row2 {
+    grid-template-rows: 1fr min-content;    
+}
+
+.layout-gap {
+    grid-gap: 20px;
+}
+
+.rows {
+    border-bottom: 2px dotted var(--color-ba);
+    padding: 5px 0px;
+}
+
+.row-header {
+    justify-self: start;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.row-label {
+    justify-self: start;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.row-image {
+    justify-self: end;
+    cursor: pointer;
+    background-color: var(--color-ba);
+    border-radius: 10px;
+    padding: 8px;
+}
+
+.container {
+    background-color: var(--color-ba);
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.p1 {
+   padding: 10px; 
+}
+
+.p2 {
+    padding: 20px;
+}
+
+.pt2 {
+    padding-top: 20px;
 }
