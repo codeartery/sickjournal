@@ -1,0 +1,8 @@
+{
+  "name": "Sick Journal",
+  "short_name": "Sick Journal",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "An app to track and log when you get sick."
+}
