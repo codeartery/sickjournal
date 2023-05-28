@@ -1,10 +1,16 @@
 :root {
-    --color-bg: #222;
+    /* background colors: main, active, themed */
+    --color-bg: #222; 
+    --color-ba: #000; 
+    --color-bt: hsl(348, 100%, 36%);
+    
+    /* foreground colors: main, active, themed */
     --color-fg: #ccc;
-    --color-ba: #000;
-    --color-fa: #fff;
-    --color-pa: #b00020;
-    --color-sa: yellow;
+    --color-fa: #fff;    
+    --color-ft: hsl(348, 100%, 50%);
+    
+    /* special colors */
+    --color-success: #50C878;
 }
 
 * {
@@ -25,8 +31,7 @@ body {
 }
 
 main {
-    background-color: var(--color-bg);
-    
+    background-color: var(--color-bg);    
 }
 
 nav {
@@ -44,11 +49,11 @@ nav > a {
     padding: 10px 20px;
     border-radius: 5px;
     text-decoration: none;
-    color: var(--color-pa);
+    color: var(--color-bt);
 }
 
 a.nav-active {
-    background-color: var(--color-pa);
+    background-color: var(--color-bt);
     color: var(--color-fg);
 }
 
@@ -73,10 +78,16 @@ a.nav-active {
 }
 
 .layout-gap {
-    grid-gap: 20px;
+    gap: 10px;
 }
 
-.rows {
+.highlighted-rows {
+    padding: 10px;
+    background-color: var(--color-ba);
+    border-radius:10px;
+}
+
+.lined-rows {
     border-bottom: 2px dotted var(--color-ba);
     padding: 5px 0px;
 }
@@ -91,6 +102,11 @@ a.nav-active {
     justify-self: start;
     font-size: 0.75rem;
     font-weight: bold;
+}
+
+.row-date {
+    justify-self: end;
+    font-size: 0.75rem;
 }
 
 .row-image {
@@ -117,4 +133,8 @@ a.nav-active {
 
 .pt2 {
     padding-top: 20px;
+}
+
+.ph2 {
+    padding: 0px 20px;
 }
