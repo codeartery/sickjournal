@@ -1,0 +1,44 @@
+.row-label {
+    font-size: 1rem;
+}
+
+.row-image:before {
+    content: '';
+    width: 0;
+    height: 100%;
+    border: 1px solid var(--color-bg);
+    margin-right: 12px;
+}
+
+.row-date {
+    padding-top: 2px;
+    color: var(--color-ft);
+}
+
+.row-image {
+    color: var(--color-bt);
+}
+
+header {
+    position: sticky;
+    top: 0;
+    padding: 20px 0;
+    background-color: var(--color-bg);
+    border-radius: 0 0 20px 20px;    
+}
+
+header > span {
+    font-size: 0.75rem;
+}
+
+input {
+    background-color: var(--color-ba);
+    border-color: var(--color-fg);
+    color: var(--color-fg);
+    padding: 5px 15px;      
+}
+
+input[type='button'] {
+    cursor: pointer;
+    margin-left: 5px;
+}

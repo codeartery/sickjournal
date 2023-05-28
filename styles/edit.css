@@ -1,0 +1,21 @@
+button {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 5px;
+    place-items: center;
+    border-radius: 10px;
+    background-color: var(--color-bg);
+    border-color: var(--color-ba);
+    padding: 5px 15px;
+    color: var(--color-fg);
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+button:first-child {
+    color: var(--color-success);
+}
+
+button:last-child {
+    color: var(--color-ft);
+}
