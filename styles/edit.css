@@ -19,3 +19,42 @@ button:first-child {
 button:last-child {
     color: var(--color-ft);
 }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.8rem;
+    text-align: left;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+} 
+
+table th {
+    background-color: var(--color-bt);
+  color: #fff;
+  font-weight: bold;
+  padding: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-top: 1px solid var(--color-ba);
+  border-bottom: 1px solid var(--color-ba);
+}
+
+table tr td {
+    padding: 5px 10px;
+}
+table tr:nth-child(even) td {
+  background-color: var(--color-ba);
+}
+
+table tr:hover td {
+  color: var(--color-ft);
+}
+
+table tr td:last-child {
+    text-align: center;
+}
