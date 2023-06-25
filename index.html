@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="./styles/global.css" />
     <link rel="stylesheet" href="./styles/index.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="apple-touch-icon" href="/icons/ios.png">
 </head>
 <body>
     
@@ -24,7 +25,7 @@
                 <div class="p1">
                     <div class="layout layout-col2 layout-gap">
                         <input type="button" name="old" value="i was sick" />
-                        <input type="button" name="new" value="i feel sick" />
+                        <input type="button" name="new" value="i feel sick" onclick="dbCreateEvent()" />
                     </div>
                 </div>
             </div>
@@ -33,23 +34,27 @@
         <section id="sickUI" class="p2">
             <div class="container">
                 <div class="layout layout-col3 layout-center">
-                    <div class="layout layout-row2 layout-center mood mood-active">
+                    <div data-mood="sick" class="layout layout-row2 layout-center mood" style="display:none;grid-column:1/4;">
+                        <span class="mood-image material-symbols-outlined">sentiment_dissatisfied</span>
+                        <span class="mood-label">sick</span>
+                    </div>
+                    <div data-mood="worse" class="layout layout-row2 layout-center mood" onclick="dbUpdateMood(this)">
                         <span class="mood-image material-symbols-outlined">sentiment_dissatisfied</span>
                         <span class="mood-label">worse</span>
                     </div>
-                    <div class="layout layout-row2 layout-center mood">
+                    <div data-mood="same" class="layout layout-row2 layout-center mood" onclick="dbUpdateMood(this)">
                         <span class="mood-image material-symbols-outlined">sentiment_neutral</span>
                         <span class="mood-label">same</span>
                     </div>
-                    <div class="layout layout-row2 layout-center mood">
+                    <div data-mood="better" class="layout layout-row2 layout-center mood" onclick="dbUpdateMood(this)">
                         <span class="mood-image material-symbols-outlined">sentiment_satisfied</span>
                         <span class="mood-label">better</span>
                     </div>
                 </div>                
                 <div class="container pt2">
                     <div class="layout layout-col2 layout-gap">
-                        <input type="button" name="cancel" value="False alarm" />
-                        <input type="button" name="save" value="All better" />
+                        <input type="button" name="cancel" value="False alarm" onclick="dbCancelEvent()" />
+                        <input type="button" name="save" value="All better" onclick="dbCompleteEvent()"  />
                     </div>
                 </div>
             </div>
@@ -57,35 +62,28 @@
             <div class="p1 pt2">
                 <div class="lined-rows layout layout-col2 layout-center">
                     <span class="row-header">symptoms</span>
-                    <span class="row-image material-symbols-outlined">add</span>
-                </div>
-                <div class="lined-rows layout layout-col2 layout-center">
-                   <span class="row-label">cough</span>
-                   <span class="row-image material-symbols-outlined">delete</span>
-               </div>
-               <div class="lined-rows layout layout-col2 layout-center">
-                   <span class="row-label">sore throat</span>
-                   <span class="row-image material-symbols-outlined">delete</span>
-               </div>
-               <div class="lined-rows layout layout-col2 layout-center">
-                   <span class="row-label">weak</span>
-                   <span class="row-image material-symbols-outlined">delete</span>
-               </div>
+                    <span class="row-image material-symbols-outlined" onclick="dbAddSymptom()">add</span>
+                </div>                
+                <template id="templateSymItem">
+                    <div data-index="0" class="lined-rows layout layout-col2 layout-center">
+                       <span class="row-label">{name}</span>
+                       <span class="row-image material-symbols-outlined" onclick="dbDeleteSymptom(this)">delete</span>
+                    </div>
+                </template>
+               
             </div>
             
             <div class="p1 pt2">
                 <div class="lined-rows layout layout-col2 layout-center">
                     <span class="row-header">medications</span>
-                    <span class="row-image material-symbols-outlined">add</span>
+                    <span class="row-image material-symbols-outlined" onclick="dbAddMedication()">add</span>
                 </div>
-                <div class="lined-rows layout layout-col2 layout-center">
-                   <span class="row-label">dayquill</span>
-                   <span class="row-image material-symbols-outlined">delete</span>
-               </div>
-               <div class="lined-rows layout layout-col2 layout-center">
-                   <span class="row-label">nyquill</span>
-                   <span class="row-image material-symbols-outlined">delete</span>
-               </div>
+                <template id="templateMedItem">
+                    <div data-index="0" class="lined-rows layout layout-col2 layout-center">
+                       <span class="row-label">{name}</span>
+                       <span class="row-image material-symbols-outlined" onclick="dbDeleteMedication(this)">delete</span>
+                   </div>
+               </template>
            </div>
         </section>
     </main>
@@ -95,5 +93,228 @@
         <a href="./pages/settings.html"><span class="material-symbols-outlined">settings</span></a>
     </nav>
    
+    <script>
+        
+        const dbReq = window.indexedDB.open('sickjournaldb', 2);
+        var dbCurrentEvent = null
+        var dbCurrentEventEntryIndex = -1
+        
+        dbReq.onsuccess = (event) => {
+            console.log('Successfully opened DB', dbReq.result)
+            uiUpdate()
+        }
+
+        dbReq.onerror = (event) => {
+            console.log('Failed to open DB', dbReq.error)
+        }
+
+        dbReq.onupgradeneeded = (event) => {
+            const db = event.target.result;            
+            const store = db.createObjectStore('sickevent', {keyPath: 'id', autoIncrement: true})
+            
+            console.log('Successfully created store', store)
+        }
+
+        function dbCreateEvent() {
+            const db = dbReq.result;
+            const tr = db.transaction(db.objectStoreNames, 'readwrite')
+            
+            const store = tr.objectStore('sickevent')
+            
+            //todo: remove the deletes            
+            store.getAll().onsuccess = (event) => {
+                const rows = event.target.result
+                rows.forEach(row => {
+            //        store.delete(row.id)
+                })                
+            }
+            
+            const now = new Date()
+            now.setHours(0,0,0,0)
+            
+            const store_add = store.add({
+                better: false,
+                entries: [{
+                    date: now,
+                    feeling: 'sick',
+                    symptoms: [],
+                    medications: ['dayquil']
+                }]
+            })
+            
+            store_add.onsuccess = (event) => {
+                uiUpdate();                
+            }
+        }
+        
+        function dbCancelEvent() {
+            //todo: delete this sick event, show warning first
+            alert('NOT YET IMPLEMENTED - Cancel')
+        }
+        
+        function dbCompleteEvent() {
+            //todo: complete this event, show warning first
+            alert('NOT YET IMPLEMENTED - Complete')
+        }
+        
+        function dbUpdateMood(item) {            
+            dbCurrentEvent.entries[dbCurrentEventEntryIndex].feeling = item.dataset.mood
+            dbUpdateEvent()
+            uiUpdateMoods()            
+        }
+        
+        function dbAddSymptom() {            
+            var userInput = prompt('New Symptom:')
+            if (userInput.length > 0) {                
+                dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms.push(userInput)
+                dbUpdateEvent()
+                uiUpdateSymptoms()            
+            }
+        }
+        
+        function dbDeleteSymptom(item) {
+            dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms[item.parentElement.dataset.index] = null
+            dbUpdateEvent()
+            uiUpdateSymptoms()
+        }
+        
+        function dbAddMedication() {            
+            var userInput = prompt('New Medication:')
+            if (userInput.length > 0) {                
+                dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications.push(userInput)
+                dbUpdateEvent()
+                uiUpdateMedications()            
+            }
+        }
+        
+        function dbDeleteMedication(item) {
+            dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications[item.parentElement.dataset.index] = null            
+            dbUpdateEvent()
+            uiUpdateMedications()
+        }
+        
+        function dbGetEntryAsync(forDate) {            
+            return new Promise((resolve, reject) => {                
+                const db = dbReq.result;
+                const tr = db.transaction(db.objectStoreNames, 'readonly')
+                const store = tr.objectStore('sickevent')
+                store.getAll().onsuccess = (event) => {
+                    const rows = event.target.result
+                    var found = false
+                    rows.forEach(row => {
+                        row.entries.forEach((entry, index) => {                            
+                            if (entry.date.getTime() == forDate.getTime()) {
+                                found = true
+                                resolve({dbEvent: row, dbEntryIndex: index})
+                            }
+                        })
+                    })
+                    if (found == false) {
+                        reject()                        
+                    }
+                }
+            })
+        }
+        
+        function dbUpdateEvent() {            
+            const db = dbReq.result;
+            const tr = db.transaction(db.objectStoreNames, 'readwrite')
+            const store = tr.objectStore('sickevent')
+            store.put(dbCurrentEvent)
+        }
+        
+        function uiUpdate() {
+            
+            const today = new Date()
+            today.setHours(0,0,0,0)
+            
+            dbGetEntryAsync(today)
+                .then((result) => {
+                    dbCurrentEvent = result.dbEvent
+                    dbCurrentEventEntryIndex = result.dbEntryIndex
+                    
+                    uiUpdateSymptoms()
+                    uiUpdateMedications()
+                    uiUpdateMoods()
+                    
+                    document.getElementById('goodUI').style.display = 'none'
+                    document.getElementById('sickUI').style.display = 'block'
+                })
+                .catch(() => {
+                    dbCurrentEvent = null
+                    dbCurrentEventEntryIndex = -1
+                    document.getElementById('goodUI').style.display = 'block'
+                    document.getElementById('sickUI').style.display = 'none'
+                })
+                
+        }
+        
+        function uiUpdateMoods() {
+            
+            var dataMoods = document.querySelectorAll('#sickUI [data-mood]')
+            var entry = dbCurrentEvent.entries[dbCurrentEventEntryIndex]
+            
+            dataMoods.forEach(mood => {
+                mood.classList.remove('mood-active')
+                
+                if (mood.dataset.mood == entry.feeling) {
+                    mood.classList.add('mood-active')
+                    if (entry.feeling == 'sick') {
+                        mood.style.display = 'grid'
+                    }
+                }
+                else if (entry.feeling == 'sick') {
+                    mood.style.display = 'none'
+                }
+            })
+            
+        }
+        
+        function uiUpdateSymptoms() {
+
+            var templateItem = document.getElementById('templateSymItem')
+            var templateContainer = templateItem.parentElement
+            
+            while(templateContainer.lastElementChild.hasAttribute('data-index')) {
+                templateContainer.removeChild(templateContainer.lastChild)
+            }
+            
+            var items = dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms
+            
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] == null) {
+                    continue
+                }
+                var item = templateItem.content.cloneNode(true)
+                item.querySelector('div').dataset.index = i
+                item.querySelector('.row-label').innerText = items[i];
+                templateContainer.appendChild(item);
+            }
+        }
+        
+        function uiUpdateMedications() {
+
+            var templateItem = document.getElementById('templateMedItem')
+            var templateContainer = templateItem.parentElement
+            
+            while(templateContainer.lastElementChild.hasAttribute('data-index')) {
+                templateContainer.removeChild(templateContainer.lastChild)
+            }
+            
+            var items = dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications
+            
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] == null) {
+                    continue
+                }
+                var item = templateItem.content.cloneNode(true)
+                item.querySelector('div').dataset.index = i
+                item.querySelector('.row-label').innerText = items[i];
+                templateContainer.appendChild(item);
+            }
+        }
+        
+    </script>
+    
 </body>
 </html>
