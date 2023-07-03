@@ -94,7 +94,6 @@
     </nav>
    
     <script>
-        
         const dbReq = window.indexedDB.open('sickjournaldb', 2);
         var dbCurrentEvent = null
         var dbCurrentEventEntryIndex = -1
@@ -114,7 +113,10 @@
             
             console.log('Successfully created store', store)
         }
-
+    </script>
+    
+    <script>
+        
         function dbCreateEvent() {
             const db = dbReq.result;
             const tr = db.transaction(db.objectStoreNames, 'readwrite')
@@ -250,7 +252,6 @@
                 }
             })
         }
-               
         
         function uiUpdate() {
             

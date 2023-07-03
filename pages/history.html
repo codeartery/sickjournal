@@ -14,36 +14,18 @@
             <span>sort <input type="button" value="newest" /></span>
         </header>
         <section class="ph2 layout layout-gap">
-            <div class="highlighted-rows layout layout-col2 layout-center">
-                <div class="row-header">
-                    <div class="row-label">11 day sickness</div>
-                    <div class="row-date">2023-05-01</div>
-                </div>
-                <form class="row-image" action="edit.html" method="GET">
-                    <input type="text" name="id" value="1" hidden />
-                    <div class="material-symbols-outlined" onclick="this.parentElement.submit();">edit</div>
+            <template id="templateHistoryItem">
+                <form action="edit.html" method="GET" class="highlighted-rows layout layout-col2 layout-center">                    
+                    <div class="row-header">
+                        <div class="row-label">x day sickness</div>
+                        <div class="row-date">yyyy-mm-dd</div>
+                    </div>
+                    <div class="row-image">
+                        <input type="text" name="id" value="-1" hidden />
+                        <div class="material-symbols-outlined" onclick="this.parentElement.parentElement.submit();">edit</div>
+                    </div>
                 </form>
-            </div>  
-  <div class="highlighted-rows layout layout-col2 layout-center">
-                <div class="row-header">
-                    <div class="row-label">5 day sickness</div>
-                    <div class="row-date">2023-06-15</div>
-                </div>
-                <form class="row-image" action="edit.html" method="GET">
-                    <input type="text" name="id" value="2" hidden />
-                    <div class="material-symbols-outlined" onclick="this.parentElement.submit();">edit</div>
-                </form>
-            </div>  
-  <div class="highlighted-rows layout layout-col2 layout-center">
-                <div class="row-header">
-                    <div class="row-label">17 day sickness</div>
-                    <div class="row-date">2023-12-23</div>
-                </div>
-                <form class="row-image" action="edit.html" method="GET">
-                    <input type="text" name="id" value="3" hidden />
-                    <div class="material-symbols-outlined" onclick="this.parentElement.submit();">edit</div>
-                </form>
-            </div>            
+            </template>            
         </section>
     </main>
     <nav>
@@ -51,6 +33,60 @@
         <a href="../pages/history.html" class="nav-active"><span class="material-symbols-outlined">auto_stories</span></a>
         <a href="../pages/settings.html"><span class="material-symbols-outlined">settings</span></a>
     </nav>
+    
+    <script>
+        const dbReq = window.indexedDB.open('sickjournaldb', 2);
+        var dbCurrentEvent = null
+        var dbCurrentEventEntryIndex = -1
+        
+        dbReq.onsuccess = (event) => {
+            console.log('Successfully opened DB', dbReq.result)
+            uiUpdate()
+        }
+
+        dbReq.onerror = (event) => {
+            console.log('Failed to open DB', dbReq.error)
+        }
+
+        dbReq.onupgradeneeded = (event) => {
+            const db = event.target.result;            
+            const store = db.createObjectStore('sickevent', {keyPath: 'id', autoIncrement: true})
+            
+            console.log('Successfully created store', store)
+        }
+    </script>
+    
+    <script>
+        
+        function uiUpdate() {            
+            const db = dbReq.result;
+            const tr = db.transaction(db.objectStoreNames, 'readonly')
+            const store = tr.objectStore('sickevent')
+            store.getAll().onsuccess = (event) => {
+                const rows = event.target.result                
+                uiUpdateHistory(rows)     
+            }
+        }
+        
+        function uiUpdateHistory(items) {
+
+            var templateItem = document.getElementById('templateHistoryItem')
+            var templateContainer = templateItem.parentElement
+            
+            while(templateContainer.lastElementChild.hasAttribute('action')) {
+                templateContainer.removeChild(templateContainer.lastChild)
+            }
+            
+            for (let i = 0; i < items.length; i++) {                
+                var item = templateItem.content.cloneNode(true)
+                item.querySelector('input').value = items[i].id
+                item.querySelector('.row-label').innerText = (items[i].entries[items[i].entries.length - 1].date.getTime() - items[i].entries[0].date.getTime()) / (1000 * 3600 * 24) + ' day sickness';
+                item.querySelector('.row-date').innerText = items[i].entries[0].date.toDateString();
+                templateContainer.appendChild(item);
+            }
+        }
+        
+    </script>
    
 </body>
 </html>
