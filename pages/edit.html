@@ -9,11 +9,11 @@
 <body>
     
     <main>
-        <dialog id="editDialog">
+        <dialog id="editDialog" data-mode="edit">
             <h2>Edit entry</h2>
             <form method="dialog" class="layout-col2">
                 <label for="diagDate">Date:</label>
-                <input type="date" name="diagDate" disabled />
+                <input type="date" name="diagDate" onchange="uiMatchEntryEditDate(this)"/>
                 
                 <label for="diagMood">Feeling:</label>
                 <select name="diagMood">
@@ -44,7 +44,7 @@
                 </thead>
                 <tbody>
                     <template id="templateEntryItem">
-                        <tr data-index="0" onclick="uiShowEntryEdit(this)">
+                        <tr data-index="0" onclick="uiShowEntryEdit(this.dataset.index)">
                             <td class="row-date">yyyy-MM-dd</td>
                             <td class="row-summary">feeling {mood} with {symptomn-list} taking {medication-list}</td>                            
                         </tr>
@@ -152,35 +152,85 @@
             window.location = '../pages/history.html'
         }
         
-        function uiShowEntryEdit(elem) {
-            dbCurrentEventEntryIndex = elem.dataset.index
-            var diag = document.getElementById('editDialog')
-            var delEntry = document.getElementById('deleteEntry')
+        function uiShowEntryEdit(index, withDate = null) {
+            dbCurrentEventEntryIndex = index
             
-            var entry = dbCurrentEvent.entries[dbCurrentEventEntryIndex]
-            diag.querySelector('[name="diagDate"]').valueAsDate = entry.date
-            diag.querySelector('[name="diagDate"').disabled = true
+            var diag = document.getElementById('editDialog')
+            var diagDate = diag.querySelector('[name="diagDate"]')
+            var diagMood = diag.querySelector('[name="diagMood"]')
+            var diagSyms = diag.querySelector('[name="diagSyms"]')
+            var diagMeds = diag.querySelector('[name="diagMeds"]')
+            var diagDel = document.getElementById('deleteEntry')
+            
+            diag.querySelector('h2').innerText = diag.dataset.mode.endsWith('edit') ? 'edit entry' : 'add entry'
+            
             if (dbCurrentEventEntryIndex <= 0) {
-                diag.querySelector('[name="diagMood"]').disabled = true
-                delEntry.style.display = 'none'
+                diagMood.disabled = true
+                diagDel.style.display = 'none'
             }
             else {
-                diag.querySelector('[name="diagMood"]').disabled = false
-                delEntry.style.display = ''                
+                diagMood.disabled = false
+                diagDel.style.display = ''
             }
-            diag.querySelectorAll('option')[['worse', 'same', 'better'].indexOf(entry.feeling)].setAttribute('selected', true)
-            diag.querySelector('[name="diagSyms"]').value = entry.symptoms.join()
-            diag.querySelector('[name="diagMeds"]').value = entry.medications.join()
             
-            diag.showModal()
+            if (dbCurrentEvent.entries.length == dbCurrentEventEntryIndex) {
+                diagDel.style.display = 'none'
+                var first = dbCurrentEvent.entries[0].date
+                                
+                //TODO: min not supported in ios
+                diagDate.setAttribute('min', first.toISOString().split('T')[0])
+                diagDate.removeAttribute('disabled')
+                
+                diagMood.querySelectorAll('option').forEach(mood => {mood.selected = false})
+                diagMood.querySelectorAll('option')[1].selected = true
+                diagSyms.value = ''
+                diagMeds.value = ''                
+            }            
+            else {
+                var entry = dbCurrentEvent.entries[dbCurrentEventEntryIndex]
+                diagDate.valueAsDate = (withDate == null) ? entry.date : withDate
+                diagMood.querySelectorAll('option').forEach(mood => {mood.selected = false})
+                diagMood.querySelectorAll(`option[value="${entry.feeling}"]`).selected = true
+                diagSyms.value = entry.symptoms.join()
+                diagMeds.value = entry.medications.join()                
+            }
+            
+            if (diag.open == false) {
+                diag.showModal()
+            }
         }
         
         function uiCancelEntryEdit() {
             var diag = document.getElementById('editDialog')
+            diag.dataset.mode = "edit"
             diag.close()
         }
         
-        function uiSaveEntryEdit() {            
+        function uiMatchEntryEditDate(elem) {
+            var diag = document.getElementById('editDialog')
+            var selDate = new Date(elem.value.replaceAll('-', '/'))
+            
+            var hasMatch = false
+            dbCurrentEvent.entries.forEach((entry, index) => {                
+                if (hasMatch == false && entry.date.getTime() == selDate.getTime()) {
+                    dbCurrentEventEntryIndex = index
+                    hasMatch = true
+                    if (diag.dataset.mode == 'add') {
+                        diag.dataset.mode += '/edit'
+                    }                
+                }                
+            })
+            
+            if (hasMatch == false && diag.dataset.mode.startsWith('add')) {
+                dbCurrentEventEntryIndex = dbCurrentEvent.entries.length
+                diag.dataset.mode = 'add'
+                selDate = null
+            }
+                        
+            uiShowEntryEdit(dbCurrentEventEntryIndex, selDate)
+        }
+        
+        function uiSaveEntryEdit() {
             if (dbCurrentEvent.entries.length == dbCurrentEventEntryIndex) {
                 dbCurrentEvent.entries.push({
                     date: new Date(),
@@ -189,21 +239,21 @@
                     medications: []
                 })
             }
-            
-            var entry = dbCurrentEvent.entries[dbCurrentEventEntryIndex]
+            var entry = dbCurrentEvent.entries[dbCurrentEventEntryIndex]            
             var diag = document.getElementById('editDialog')
             var diagDate = diag.querySelector('[name="diagDate"]')
             var diagMood = diag.querySelector('[name="diagMood"]')
             var diagSyms = diag.querySelector('[name="diagSyms"]')
             var diagMeds = diag.querySelector('[name="diagMeds"]')
             
+            diag.dataset.mode = "edit"
             entry.date = new Date(diagDate.value.replaceAll('-', '/'))
             entry.feeling = diagMood.value
             entry.symptoms = diagSyms.value.split(',')
             entry.medications = diagMeds.value.split(',')
             
-            //todo: do not allow conflicting dates
-            //todo: sort entries by date
+            dbCurrentEvent.entries.sort((a,b)=>a.date.getTime()-b.date.getTime());
+            dbCurrentEvent.entries[0].feeling = 'worse'
             
             uiUpdateEntries(dbCurrentEvent.entries)
             
@@ -217,27 +267,15 @@
             dbCurrentEvent.entries.splice(dbCurrentEventEntryIndex, 1)
             uiUpdateEntries(dbCurrentEvent.entries)
             var diag = document.getElementById('editDialog')
+            diag.dataset.mode = "edit"
             diag.close()
         }
         
         function uiAddEntry() {
-            dbCurrentEventEntryIndex = dbCurrentEvent.entries.length
-            
-            document.getElementById('deleteEntry').style.display = 'none'
-            var first = dbCurrentEvent.entries[0].date
-            
             var diag = document.getElementById('editDialog')
-            
-            var diagDate = diag.querySelector('[name="diagDate"')
-            var diagMood = diag.querySelector('[name="diagMood"')
-            
-            //TODO: min not supported in ios
-            diagDate.setAttribute('min', first.toISOString().split('T')[0])
-            diagDate.removeAttribute('disabled')
-            
-            diagMood.querySelectorAll('option')[1].setAttribute('selected', true)
-            
-            diag.showModal()
+            diag.dataset.mode = "add"
+            diag.querySelector('[name="diagDate"]').value = ''
+            uiShowEntryEdit(dbCurrentEvent.entries.length)
         }
         
     </script>
