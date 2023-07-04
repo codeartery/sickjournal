@@ -33,11 +33,7 @@
         
         <section id="sickUI" class="p2">
             <div class="container">
-                <div class="layout layout-col3 layout-center">
-                    <div data-mood="sick" class="layout layout-row2 layout-center mood" style="display:none;grid-column:1/4;">
-                        <span class="mood-image material-symbols-outlined">sentiment_dissatisfied</span>
-                        <span class="mood-label">sick</span>
-                    </div>
+                <div class="layout-flex"> 
                     <div data-mood="worse" class="layout layout-row2 layout-center mood" onclick="dbUpdateMood(this)">
                         <span class="mood-image material-symbols-outlined">sentiment_dissatisfied</span>
                         <span class="mood-label">worse</span>
@@ -123,14 +119,12 @@
             
             const store = tr.objectStore('sickevent')
             
-            
             /*//note: clear database
             store.getAll().onsuccess = (event) => {
                 event.target.result.forEach(item => {store.delete(item.id)})
             }
             */
             
-            //const today = new Date('2023-06-24')
             const today = new Date()
             today.setHours(0,0,0,0)
             
@@ -138,7 +132,7 @@
                 better: false,
                 entries: [{
                     date: today,
-                    feeling: 'sick',
+                    feeling: 'worse',
                     symptoms: [],
                     medications: []
                 }]
@@ -192,7 +186,7 @@
         }
         
         function dbDeleteSymptom(item) {
-            dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms[item.parentElement.dataset.index] = null
+            dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms.splice(item.parentElement.dataset.index, 1)
             dbUpdateEvent()
             uiUpdateSymptoms()
         }
@@ -207,7 +201,7 @@
         }
         
         function dbDeleteMedication(item) {
-            dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications[item.parentElement.dataset.index] = null            
+            dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications.splice(item.parentElement.dataset.index, 1)            
             dbUpdateEvent()
             uiUpdateMedications()
         }
@@ -227,7 +221,7 @@
                                 resolve({dbEvent: row, dbEntryIndex: index})
                             }
                         })
-                        if (row.better == false) {
+                        if (found == false && row.better == false) {
                             found = true
                             var today = new Date()
                             today.setHours(0,0,0,0)
@@ -270,12 +264,13 @@
                         dbCurrentEventEntryIndex = -1
                         document.getElementById('goodUI').style.display = 'block'
                         document.getElementById('sickUI').style.display = 'none'
+                        return
                     }
                     
+                    uiUpdateMoods()
                     uiUpdateSymptoms()
                     uiUpdateMedications()
-                    uiUpdateMoods()
-                    
+                                        
                     document.getElementById('goodUI').style.display = 'none'
                     document.getElementById('sickUI').style.display = 'block'
                 })
@@ -313,13 +308,10 @@
                 mood.classList.remove('mood-active')
                 
                 if (mood.dataset.mood == entry.feeling) {
-                    mood.classList.add('mood-active')
-                    if (entry.feeling == 'sick') {
-                        mood.style.display = 'grid'
-                    }
+                    mood.classList.add('mood-active')                    
                 }
-                else if (entry.feeling == 'sick') {
-                    mood.style.display = 'none'
+                else if (dbCurrentEventEntryIndex <= 0) {
+                    mood.style.display = 'none';                
                 }
             })
             
@@ -336,10 +328,7 @@
             
             var items = dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms
             
-            for (let i = 0; i < items.length; i++) {
-                if (items[i] == null) {
-                    continue
-                }
+            for (let i = 0; i < items.length; i++) {                
                 var item = templateItem.content.cloneNode(true)
                 item.querySelector('div').dataset.index = i
                 item.querySelector('.row-label').innerText = items[i];
@@ -358,10 +347,7 @@
             
             var items = dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications
             
-            for (let i = 0; i < items.length; i++) {
-                if (items[i] == null) {
-                    continue
-                }
+            for (let i = 0; i < items.length; i++) {                
                 var item = templateItem.content.cloneNode(true)
                 item.querySelector('div').dataset.index = i
                 item.querySelector('.row-label').innerText = items[i];

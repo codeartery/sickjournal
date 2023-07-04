@@ -61,6 +61,13 @@ a.nav-active {
     display: grid;
 }
 
+.layout-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin: 0 20px;
+}
+
 .layout-center {
     place-items: center;
 }

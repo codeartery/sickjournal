@@ -7,7 +7,7 @@ button {
     background-color: var(--color-bg);
     border-color: var(--color-ba);
     padding: 5px 15px;
-    color: var(--color-fg);
+    color: var(--color-ft);
     text-transform: uppercase;
     font-weight: bold;
 }
@@ -17,7 +17,7 @@ button:first-child {
 }
 
 button:last-child {
-    color: var(--color-ft);
+    color: var(--color-fg);
 }
 
 table {
@@ -28,33 +28,72 @@ table {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    margin: auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin: 10px auto;
 } 
 
 table th {
-    background-color: var(--color-bt);
-  color: #fff;
-  font-weight: bold;
-  padding: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border-top: 1px solid var(--color-ba);
-  border-bottom: 1px solid var(--color-ba);
+    background-color: var(--color-ba);
+    color: var(--color-fg);
+    font-weight: bold;
+    padding: 20px 10px;    
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-top: 1px solid var(--color-ba);
+    border-bottom: 1px solid var(--color-ba);
 }
 
 table tr td {
-    padding: 5px 10px;
+    padding: 15px 10px;
 }
 table tr:nth-child(even) td {
-  background-color: var(--color-ba);
+  border-bottom: 1px solid var(--color-ba);
 }
 
 table tr:hover td {
-  color: var(--color-ft);
+  color: #fff;
 }
 
-table tr td:last-child {
+table tr *:last-child {
     text-align: center;
+}
+
+dialog {
+    background-color: var(--color-fg);  
+    border: none !important;
+    border-radius: 25px;
+    box-shadow: 0 0 #000, 0 0 #000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    margin: 4rem auto;
+    padding: 1rem 2rem;
+    min-width: 400px;
+}
+
+dialog::backdrop {
+    background-color: rgba(0,0,0,0.3);
+}
+
+dialog > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+dialog > form {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4, 1fr);
+    margin: 1rem 0;
+}
+
+dialog > form > label {
+    grid-column: 1;
+}
+
+dialog > form > input, 
+dialog > form > select {
+    grid-column: 2;    
+}
+
+section button {
+    background-color: var(--color-ba);
+    margin: 2rem auto;    
 }

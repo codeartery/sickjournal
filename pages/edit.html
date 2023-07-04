@@ -8,86 +8,93 @@
 </head>
 <body>
     
-    <main>  
+    <main>
+        <dialog id="editDialog">
+            <h2>Edit entry</h2>
+            <form method="dialog" class="layout-col2">
+                <label for="diagDate">Date:</label>
+                <input type="date" name="diagDate" disabled />
+                
+                <label for="diagMood">Feeling:</label>
+                <select name="diagMood">
+                    <option value="worse">worse</option>
+                    <option value="same">same</option>
+                    <option value="better">better</option>
+                </select>
+                
+                <label for="diagSyms">Symptoms:</label>
+                <input type="text" name="diagSyms"/>
+                
+                <label for="diagMeds">Medications:</label>
+                <input type="text" name="diagMeds"/>
+            </form>
+            <div>
+                <button onclick="uiSaveEntryEdit()">save<span class="material-symbols-outlined">save</span></button>
+                <button id="deleteEntry" onclick="uiDeleteEntry()">delete<span class="material-symbols-outlined">delete</span></button>
+                <button onclick="uiCancelEntryEdit()">cancel<span class="material-symbols-outlined">cancel</span></button>
+            </div>
+        </dialog>
         <section>
             <table>
                 <thead>
                     <tr>
                         <th>date</th>
-                        <th>summary</th>
-                        <th>edit</th>
+                        <th>summary</th>                        
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>2023-04-01</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-02</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-05</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-05</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-01</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-02</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-05</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-05</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr><tr>
-                        <td>2023-04-01</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-02</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-05</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
-                    <tr>
-                        <td>2023-04-05</td>
-                        <td>feeling [sick] with [symptomn-list] taking [medication-list]</td>
-                        <td><span class="material-symbols-outlined">edit</span></td>
-                    </tr>
+                    <template id="templateEntryItem">
+                        <tr data-index="0" onclick="uiShowEntryEdit(this)">
+                            <td class="row-date">yyyy-MM-dd</td>
+                            <td class="row-summary">feeling {mood} with {symptomn-list} taking {medication-list}</td>                            
+                        </tr>
+                    </template>
                 </tbody>
             </table>
+            <button onclick="uiAddEntry()">add<span class="material-symbols-outlined">add</span></button>
         </section>
     </main>
     <nav>
-        <button>save<span class="material-symbols-outlined">save</span></button>
-        <button>cancel<span class="material-symbols-outlined">cancel</span></button>
-        <button>delete<span class="material-symbols-outlined">delete</span></button>
+        <button onclick="dbUpdateEvent()">save<span class="material-symbols-outlined">save</span></button>
+        <button onclick="dbDeleteEvent()">delete<span class="material-symbols-outlined">delete</span></button>
+        <button onclick="uiCancelEdits()">cancel<span class="material-symbols-outlined">cancel</span></button>
     </nav>
+    
    <script>
+        const dbReq = window.indexedDB.open('sickjournaldb', 2);
+        var dbCurrentEvent = null
+        var dbCurrentEventEntryIndex = -1
+        
+        dbReq.onsuccess = (event) => {
+            console.log('Successfully opened DB', dbReq.result)
+            uiUpdate()
+        }
+
+        dbReq.onerror = (event) => {
+            console.log('Failed to open DB', dbReq.error)
+        }
+
+        dbReq.onupgradeneeded = (event) => {
+            const db = event.target.result;            
+            const store = db.createObjectStore('sickevent', {keyPath: 'id', autoIncrement: true})
+            
+            console.log('Successfully created store', store)
+        }
+    </script>
+    
+    <script>
+        
+        function dbUpdateEvent() {
+            if (confirm('Save all edits?') == false) {
+                return
+            }
+            const db = dbReq.result;
+            const tr = db.transaction(db.objectStoreNames, 'readwrite')
+            const store = tr.objectStore('sickevent')
+            store.put(dbCurrentEvent)
+            window.location = '../pages/history.html'
+        }
+        
         function getUrlParams() {    
             var vars = {};  
             var parts = window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
@@ -95,9 +102,144 @@
             });
             return vars;
         }
-        urlparams = getUrlParams();
-        alert('the id to load is ' + urlparams['id'])
-       
-   </script>
+        
+        function dbDeleteEvent() {
+            if (confirm('Delete entire event and all entries?') == false) {
+                return
+            }
+            const db = dbReq.result;
+            const tr = db.transaction(db.objectStoreNames, 'readwrite')            
+            const store = tr.objectStore('sickevent')            
+            store.delete(dbCurrentEvent.id)
+            window.location = '../pages/history.html'
+        }
+                
+        function uiUpdate() {
+            var urlparams = getUrlParams();
+            var dbId = parseInt(urlparams['id'])
+
+            const db = dbReq.result;
+            const tr = db.transaction(db.objectStoreNames, 'readonly')
+            const store = tr.objectStore('sickevent')
+            store.get(dbId).onsuccess = (event) => {
+                dbCurrentEvent = event.target.result                
+                uiUpdateEntries(dbCurrentEvent.entries)
+            }
+        }
+        
+        function uiUpdateEntries(items) {
+
+            var templateItem = document.getElementById('templateEntryItem')
+            var templateContainer = templateItem.parentElement
+            
+            while(templateContainer.lastElementChild.hasAttribute('data-index')) {
+                templateContainer.removeChild(templateContainer.lastChild)
+            }
+            
+            for (let i = 0; i < items.length; i++) {                
+                var item = templateItem.content.cloneNode(true)
+                var mood = items[i].feeling
+                var syms = items[i].symptoms.join(',')
+                var meds = items[i].medications.join(',')
+                item.querySelector('tr').dataset.index = i
+                item.querySelector('.row-date').innerText = items[i].date.toDateString()
+                item.querySelector('.row-summary').innerText = `feeling ${mood}${syms.length > 0 ? ', with symptoms: ' : ''}${syms}${meds.length > 0 ? '. taking: ' : ''}${meds}.`
+                templateContainer.appendChild(item);
+            }
+        }
+        
+        function uiCancelEdits() {            
+            window.location = '../pages/history.html'
+        }
+        
+        function uiShowEntryEdit(elem) {
+            dbCurrentEventEntryIndex = elem.dataset.index
+            var diag = document.getElementById('editDialog')
+            var delEntry = document.getElementById('deleteEntry')
+            
+            var entry = dbCurrentEvent.entries[dbCurrentEventEntryIndex]
+            diag.querySelector('[name="diagDate"]').valueAsDate = entry.date
+            diag.querySelector('[name="diagDate"').disabled = true
+            if (dbCurrentEventEntryIndex <= 0) {
+                diag.querySelector('[name="diagMood"]').disabled = true
+                delEntry.style.display = 'none'
+            }
+            else {
+                diag.querySelector('[name="diagMood"]').disabled = false
+                delEntry.style.display = ''                
+            }
+            diag.querySelectorAll('option')[['worse', 'same', 'better'].indexOf(entry.feeling)].setAttribute('selected', true)
+            diag.querySelector('[name="diagSyms"]').value = entry.symptoms.join()
+            diag.querySelector('[name="diagMeds"]').value = entry.medications.join()
+            
+            diag.showModal()
+        }
+        
+        function uiCancelEntryEdit() {
+            var diag = document.getElementById('editDialog')
+            diag.close()
+        }
+        
+        function uiSaveEntryEdit() {            
+            if (dbCurrentEvent.entries.length == dbCurrentEventEntryIndex) {
+                dbCurrentEvent.entries.push({
+                    date: new Date(),
+                    feeling: 'same',
+                    symptoms: [],
+                    medications: []
+                })
+            }
+            
+            var entry = dbCurrentEvent.entries[dbCurrentEventEntryIndex]
+            var diag = document.getElementById('editDialog')
+            var diagDate = diag.querySelector('[name="diagDate"]')
+            var diagMood = diag.querySelector('[name="diagMood"]')
+            var diagSyms = diag.querySelector('[name="diagSyms"]')
+            var diagMeds = diag.querySelector('[name="diagMeds"]')
+            
+            entry.date = new Date(diagDate.value.replaceAll('-', '/'))
+            entry.feeling = diagMood.value
+            entry.symptoms = diagSyms.value.split(',')
+            entry.medications = diagMeds.value.split(',')
+            
+            //todo: do not allow conflicting dates
+            //todo: sort entries by date
+            
+            uiUpdateEntries(dbCurrentEvent.entries)
+            
+            diag.close()
+        }
+        
+        function uiDeleteEntry() {
+            if (confirm('Delete this entire entry?') == false) {
+                return
+            }
+            dbCurrentEvent.entries.splice(dbCurrentEventEntryIndex, 1)
+            uiUpdateEntries(dbCurrentEvent.entries)
+            var diag = document.getElementById('editDialog')
+            diag.close()
+        }
+        
+        function uiAddEntry() {
+            dbCurrentEventEntryIndex = dbCurrentEvent.entries.length
+            
+            document.getElementById('deleteEntry').style.display = 'none'
+            var first = dbCurrentEvent.entries[0].date
+            
+            var diag = document.getElementById('editDialog')
+            
+            var diagDate = diag.querySelector('[name="diagDate"')
+            var diagMood = diag.querySelector('[name="diagMood"')
+            
+            //TODO: min not supported in ios
+            diagDate.setAttribute('min', first.toISOString().split('T')[0])
+            diagDate.removeAttribute('disabled')
+            
+            diagMood.querySelectorAll('option')[1].setAttribute('selected', true)
+            
+            diag.showModal()
+        }
+        
+    </script>
 </body>
 </html>
