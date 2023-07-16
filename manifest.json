@@ -3,6 +3,6 @@
   "short_name": "Sick Journal",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#fff",
+  "background_color": "#000",
   "description": "An offline PWA for journaling sickness."
 }
