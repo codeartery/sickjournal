@@ -40,7 +40,7 @@ nav {
     place-items: center;
     position: sticky;
     bottom: 0;
-    height: 50px;
+    height: 10vh;
     background-color: var(--color-ba);
     border-radius: 5px 5px 0px 0px;
 }

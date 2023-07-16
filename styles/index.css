@@ -5,7 +5,8 @@ header {
     place-items: center;
     background-color: var(--color-ba);
     padding: 20px 5px 0px 5px;
-    border-radius: 0 0 20px 20px;
+    border-radius: 0 0 20px 20px;    
+    height: 15vh;
 }
 
 header > .days-sick-label {
