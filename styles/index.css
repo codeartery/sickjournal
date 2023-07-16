@@ -72,7 +72,7 @@ header > .last-sick > .last-sick-label {
     border: none;
 }
 
-#goodUI input:last-child {
+#goodUI input[type='button'] {
     background-color: var(--color-bt);
 }
 

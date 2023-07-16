@@ -19,6 +19,17 @@
             <span>view <input type="button" value="history"/></span>            
             <span>sort <input type="button" value="newest" /></span>
         </header>
+        <dialog id="newDialog">
+            <h2>new entry</h2>
+            <form method="dialog" class="layout-col2">
+                <label for="diagDate">Date:</label>
+                <input type="date" name="diagDate"/>
+            </form>
+            <div>
+                <button onclick="dbSaveNewEvent()">save<span class="material-symbols-outlined">save</span></button>
+                <button onclick="uiCancelNewEvent()">cancel<span class="material-symbols-outlined">cancel</span></button>
+            </div>
+        </dialog>
         <section class="ph2 layout layout-gap">
             <template id="templateHistoryItem">
                 <form action="edit.html" method="GET" class="highlighted-rows layout layout-col2 layout-center">                    
@@ -33,6 +44,7 @@
                 </form>
             </template>            
         </section>
+        <button onclick="uiAddNewEvent()">add<span class="material-symbols-outlined">add</span></button>
     </main>
     <nav>
         <a href="../index.html"><span class="material-symbols-outlined">thermostat</span></a>
@@ -64,6 +76,14 @@
     
     <script>
         
+        function getUrlParams() {    
+            var vars = {};  
+            var parts = window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+                vars[key] = value;
+            });
+            return vars;
+        }
+        
         function uiUpdate() {            
             const db = dbReq.result;
             const tr = db.transaction(db.objectStoreNames, 'readonly')
@@ -71,6 +91,11 @@
             store.getAll().onsuccess = (event) => {
                 const rows = event.target.result                
                 uiUpdateHistory(rows)     
+            }
+            
+            const urlparams = getUrlParams();
+            if ('old' in urlparams) {
+                uiAddNewEvent()
             }
         }
         
@@ -90,6 +115,49 @@
                 item.querySelector('.row-date').innerText = items[i].entries[0].date.toDateString();
                 templateContainer.appendChild(item);
             }
+        }
+        
+        function uiAddNewEvent() {
+            var diag = document.getElementById('newDialog')
+            if (diag.open == false) {
+                diag.showModal()
+            }
+        }
+        
+        function uiCancelNewEvent() {
+            var diag = document.getElementById('newDialog')
+            diag.close()
+        }
+        
+        function dbSaveNewEvent() {
+            const db = dbReq.result;
+            const tr = db.transaction(db.objectStoreNames, 'readwrite')            
+            const store = tr.objectStore('sickevent')
+            
+            var diag = document.getElementById('newDialog')
+            var diagDate = diag.querySelector('[name="diagDate"]')            
+            var eventDate = new Date(diagDate.value.replaceAll('-', '/'))
+            
+            if (isNaN(eventDate.getTime())) {
+                alert('Invalid date selected!')
+                return
+            }
+            
+            const store_add = store.add({
+                better: true,
+                entries: [{
+                    date: eventDate,
+                    feeling: 'worse',
+                    symptoms: [],
+                    medications: []
+                }]
+            })
+            
+            store_add.onsuccess = (event) => {
+                window.location.replace('../pages/edit.html?id='+event.target.result)
+            }
+            
+            diag.close()
         }
         
     </script>
