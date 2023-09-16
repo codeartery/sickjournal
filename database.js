@@ -6,7 +6,7 @@ dbConnection.onupgradeneeded = (event) => {
     const db = event.target.result;            
     
     console.log(`Upgrading from version ${event.oldVersion} to version ${db.version}`)
-    alert(`Upgrading from version '${event.oldVersion}' to version '${db.version}'.`)
+    //alert(`Upgrading from version '${event.oldVersion}' to version '${db.version}'.`)
     
     if (event.oldVersion < 1) {
         //version one was for testing and was never in production
