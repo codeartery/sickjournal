@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <link rel="apple-touch-icon" href="/icons/ios.png">
     
+    <script type="text/javascript" src="./database.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./serviceworker.js')
@@ -91,6 +92,16 @@
                    </div>
                </template>
            </div>
+           
+           <div class="p1 pt2">
+                <div class="lined-rows layout layout-col2 layout-center">
+                    <span class="row-header">journal</span>
+                    <span class="row-image material-symbols-outlined" onclick="dbSaveJournal(this)">save</span>
+                </div>
+                <div>
+                   <textarea id="journalText"></textarea>
+               </div>
+           </div>
         </section>
     </main>
     <nav>
@@ -98,33 +109,20 @@
         <a href="./pages/history.html"><span class="material-symbols-outlined">auto_stories</span></a>
         <a href="./pages/settings.html"><span class="material-symbols-outlined">settings</span></a>
     </nav>
-   
-    <script>
-        const dbReq = window.indexedDB.open('sickjournaldb', 2);
-        var dbCurrentEvent = null
-        var dbCurrentEventEntryIndex = -1
-        
-        dbReq.onsuccess = (event) => {
-            console.log('Successfully opened DB', dbReq.result)
-            uiUpdate()
-        }
-
-        dbReq.onerror = (event) => {
-            console.log('Failed to open DB', dbReq.error)
-        }
-
-        dbReq.onupgradeneeded = (event) => {
-            const db = event.target.result;            
-            const store = db.createObjectStore('sickevent', {keyPath: 'id', autoIncrement: true})
-            
-            console.log('Successfully created store', store)
-        }
-    </script>
     
     <script>
         
+        dbConnection.onsuccess = (event) => {
+            console.log('Successfully opened DB', dbConnection.result)
+            uiUpdate()
+        }
+        
+        dbConnection.onerror = (event) => {
+            console.log('Failed to open DB', dbConnection.error)
+        }
+        
         function dbCreateEvent() {
-            const db = dbReq.result;
+            const db = dbConnection.result;
             const tr = db.transaction(db.objectStoreNames, 'readwrite')
             
             const store = tr.objectStore('sickevent')
@@ -140,6 +138,7 @@
             
             const store_add = store.add({
                 better: false,
+                journal: "",
                 entries: [{
                     date: today,
                     feeling: 'worse',
@@ -154,7 +153,7 @@
         }
         
         function dbUpdateEvent() {            
-            const db = dbReq.result;
+            const db = dbConnection.result;
             const tr = db.transaction(db.objectStoreNames, 'readwrite')
             const store = tr.objectStore('sickevent')
             store.put(dbCurrentEvent)
@@ -164,7 +163,7 @@
             if (confirm('This will delete this sick event.') == false) {
                 return
             }            
-            const db = dbReq.result;
+            const db = dbConnection.result;
             const tr = db.transaction(db.objectStoreNames, 'readwrite')            
             const store = tr.objectStore('sickevent')            
             store.delete(dbCurrentEvent.id)
@@ -216,9 +215,19 @@
             uiUpdateMedications()
         }
         
+        function dbSaveJournal(btn) {   
+            var txtArea = document.getElementById('journalText')         
+            dbCurrentEvent.journal = txtArea.value            
+            dbUpdateEvent()
+            uiUpdateJournal()
+            var crntColor = btn.style.color;
+            btn.style.color = "var(--color-success)";
+            setTimeout(()=> btn.style.color = crntColor, 1500)
+        }
+        
         function dbGetEntryAsync(forDate) {            
             return new Promise((resolve, reject) => {                
-                const db = dbReq.result;
+                const db = dbConnection.result;
                 const tr = db.transaction(db.objectStoreNames, 'readonly')
                 const store = tr.objectStore('sickevent')
                 store.getAll().onsuccess = (event) => {
@@ -280,6 +289,7 @@
                     uiUpdateMoods()
                     uiUpdateSymptoms()
                     uiUpdateMedications()
+                    uiUpdateJournal()
                                         
                     document.getElementById('goodUI').style.display = 'none'
                     document.getElementById('sickUI').style.display = 'block'
@@ -362,7 +372,12 @@
                 item.querySelector('div').dataset.index = i
                 item.querySelector('.row-label').innerText = items[i];
                 templateContainer.appendChild(item);
-            }
+            }        
+        }
+        
+        function uiUpdateJournal() {         
+            var txtArea = document.getElementById('journalText')         
+            txtArea.value = dbCurrentEvent.journal            
         }
         
     </script>
