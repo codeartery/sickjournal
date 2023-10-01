@@ -2,8 +2,8 @@
 An offline PWA for journaling sickness.
 
 ## TODO
-- UI touchups for mobile
-- Settings page (enable notifications, export/import database)
+- UI design
+- Settings page (enable notifications)
 - Notifications when sick
 - History sorting
 - History statistics
