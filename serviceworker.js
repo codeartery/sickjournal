@@ -7,14 +7,17 @@ self.addEventListener('install', e => {
             return cache.addAll([
                 '/', 
                 '/manifest.json',
-                '/index.html',                
+                '/index.html',
+                '/database.js',
+                '/serviceworker.js',                
                 '/pages/edit.html',
                 '/pages/history.html',
                 '/pages/settings.html',
                 '/styles/global.css', 
                 '/styles/index.css',
                 '/styles/edit.css',
-                '/styles/history.css'
+                '/styles/history.css',
+                
             ])
         })
     )
