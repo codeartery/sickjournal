@@ -1,8 +1,9 @@
 {
   "name": "Sick Journal",
   "short_name": "Sick Journal",
+  "description": "An offline PWA for journaling sickness.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000",
-  "description": "An offline PWA for journaling sickness."
+  "theme_color": "#000"
 }
