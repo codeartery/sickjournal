@@ -4,6 +4,6 @@
   "description": "An offline PWA for journaling sickness.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#000",
-  "theme_color": "#000"
+  "background_color": "#ddd",
+  "theme_color": "#ddd"
 }
