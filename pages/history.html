@@ -17,9 +17,13 @@
 <body>
     
     <main>
-        <header class="layout layout-col2 layout-center">
-            <span>view <input type="button" value="history"/></span>            
-            <span>sort <input type="button" value="newest" /></span>
+        <header>
+            <span id="elemStatCountValue" class="stat-value">0</span>
+            <span id="elemStatAvgLasting" class="stat-value">0</span>
+            
+            <span>records</span>
+            <span>avg lasting</span>
+            
         </header>
         <dialog id="newDialog">
             <h2>new entry</h2>
@@ -28,25 +32,30 @@
                 <input type="date" name="diagDate"/>
             </form>
             <div>
-                <button onclick="dbSaveNewEvent()">save<span class="material-symbols-outlined">save</span></button>
-                <button onclick="uiCancelNewEvent()">cancel<span class="material-symbols-outlined">cancel</span></button>
+                <button class="btn color-green" onclick="dbSaveNewEvent()">
+                    <span>save</span><span class="material-symbols-outlined">save</span></button>
+                <button class="btn" onclick="uiCancelNewEvent()">
+                    <span>cancel</span><span class="material-symbols-outlined">cancel</span></button>
             </div>
         </dialog>
-        <section class="ph2 layout layout-gap">
+        <section class="mt1 ph2 layout layout-gap">
             <template id="templateHistoryItem">
-                <form action="edit.html" method="GET" class="highlighted-rows layout layout-col2 layout-center">                    
+                <form action="edit.html" method="GET" class="highlighted-rows layout layout-col2 layout-center" onclick="this.submit()">                    
                     <div class="row-header">
-                        <div class="row-label">x day sickness</div>
+                        <div class="row-label">0 day sickness</div>
                         <div class="row-date">yyyy-mm-dd</div>
                     </div>
                     <div class="row-image">
                         <input type="text" name="id" value="-1" hidden />
-                        <div class="material-symbols-outlined" onclick="this.parentElement.parentElement.submit();">edit</div>
+                        <div class="material-symbols-outlined">edit</div>
                     </div>
                 </form>
             </template>            
         </section>
-        <button onclick="uiAddNewEvent()">add<span class="material-symbols-outlined">add</span></button>
+        <button class="btn center" onclick="uiAddNewEvent()">
+            <span>add</span>
+            <span class="material-symbols-outlined">add</span>
+        </button>
     </main>
     <nav>
         <a href="../index.html"><span class="material-symbols-outlined">thermostat</span></a>
@@ -97,12 +106,22 @@
                 templateContainer.removeChild(templateContainer.lastChild)
             }
             
+            var cnt = items.length
+            var sum = 0
+            
             for (let i = 0; i < items.length; i++) {                
                 var item = templateItem.content.cloneNode(true)
                 item.querySelector('input').value = items[i].id
-                item.querySelector('.row-label').innerText = (items[i].entries[items[i].entries.length - 1].date.getTime() - items[i].entries[0].date.getTime()) / (1000 * 3600 * 24) + ' day sickness';
+                days = Math.trunc((items[i].entries[items[i].entries.length - 1].date.getTime() - items[i].entries[0].date.getTime()) / (1000 * 3600 * 24))
+                sum += days
+                item.querySelector('.row-label').innerText = days + ' day sickness';
                 item.querySelector('.row-date').innerText = items[i].entries[0].date.toDateString();
                 templateContainer.appendChild(item);
+            }
+            
+            document.getElementById('elemStatCountValue').innerText = cnt
+            if (cnt > 0) {
+                document.getElementById('elemStatAvgLasting').innerText = Math.round(sum / cnt)
             }
         }
         

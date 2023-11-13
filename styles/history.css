@@ -2,68 +2,39 @@
     font-size: 1rem;
 }
 
-.row-image:before {
-    content: '';
-    width: 0;
-    height: 100%;
-    border: 1px solid var(--color-bg);
-    margin-right: 12px;
-}
-
 .row-date {
     padding-top: 2px;
-    color: var(--color-ft);
+    color: gray;
 }
 
 .row-image {
-    color: var(--color-bt);
+    color: black;
 }
 
 header {
-    position: sticky;
-    top: 0;
-    padding: 20px 0;
-    background-color: var(--color-bg);
-    border-radius: 0 0 20px 20px;    
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 2.5fr;
+    padding: 10px;
+    padding-bottom: 20px;
+    
+    box-shadow: 0px 5px 5px #eee;
+    border-radius: 20px;
 }
 
 header > span {
     font-size: 0.75rem;
+    align-self: center;
+    justify-self: center;
 }
 
-input[type='button'] {
-    background-color: var(--color-ba);
-    border-color: var(--color-fg);
-    color: var(--color-fg);
-    padding: 5px 15px;    
-    cursor: pointer;
-    margin-left: 5px;
-}
-
-button {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 5px;
-    place-items: center;
-    border-radius: 10px;
-    background-color: var(--color-bg);
-    border-color: var(--color-ba);
-    padding: 5px 15px;
-    color: var(--color-ft);
-    text-transform: uppercase;
+header > .stat-value {
+    font-size: 3rem;
     font-weight: bold;
 }
 
-button:first-child {
-    color: var(--color-success);
-}
-
-button:last-child {
-    color: var(--color-fg);
-}
-
 dialog {
-    background-color: var(--color-fg);  
+    background-color: #fff;  
     border: none !important;
     border-radius: 25px;
     box-shadow: 0 0 #000, 0 0 #000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -73,31 +44,24 @@ dialog {
 }
 
 dialog::backdrop {
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0,0,0,0.7);
 }
 
-dialog > div {
+dialog > div,
+dialog > form {
     display: flex;
     justify-content: space-between;
 }
 
 dialog > form {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr 1fr;
-    margin: 1rem 0;
+    padding: 40px 0;
 }
 
-dialog > form > label {
-    grid-column: 1;
+input[type="date"] {
+    width: 200px;
 }
 
-dialog > form > input, 
-dialog > form > select {
-    grid-column: 2;    
-}
-
-main > button {
-    background-color: var(--color-ba);
-    margin: 2rem auto;    
+form:hover,
+form:active {
+    background-color: whitesmoke;
 }
