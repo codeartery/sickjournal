@@ -19,20 +19,20 @@
         <div class="p2">
             <h2>Database</h2>
             <div class="layout layout-col2 p1">
-                <label style="margin: 5px;">View data:</label>
-                <input style="margin: 5px;" type="button" value="View" onclick="dbView()" />
+                <label style="padding: 5px;">View data:</label>
+                <input style="padding: 5px;" type="button" value="View" onclick="dbView()" />
 
-                <label style="margin: 5px;">Export data:</label>          
-                <input style="margin: 5px;" type="button" value="Export" onclick="dbExport()" />
+                <label style="padding: 5px;">Export data:</label>          
+                <input style="padding: 5px;" type="button" value="Export" onclick="dbExport()" />
 
-                <label style="margin: 5px;">Import data:</label>
-                <input style="margin: 5px;" type="button" value="Import" onclick="dbImport()" />                
-                <label style="margin: 5px;"></label>
-                <input style="margin: 5px;" id="importFileSelection" type="file" accept=".json" />
+                <label style="padding: 5px;">Import data:</label>
+                <input style="padding: 5px;" type="button" value="Import" onclick="dbImport()" />                
+                <label style="padding: 5px;"></label>
+                <input style="padding: 5px;" id="importFileSelection" type="file" accept=".json" />
             </div>
-            <p id="viewAsJson" style="margin: 10px;background-color:black;width:auto;height:150px;overflow-y:scroll;border-radius:10px;"></p>
+
         </div>
-        
+            <div id="viewAsJson" style="background:#ddd;padding-top:10px;min-height:10px;overflow-y:scroll;border-radius:10px;"></div>        
     </main>
     <nav>
         <a href="../index.html"><span class="material-symbols-outlined">thermostat</span></a>

@@ -20,10 +20,10 @@
     
     <main>
         <header>
-            <span class="days-sick-label">Day </span><span class="days-sick-value" id="daysSickValue">0</span>
-            <span class="last-sick">
-                <span class="last-sick-label">Last sickness: </span><span class="last-sick-value" id="lastSickValue"></span>
-            </span>
+            <span class="days-sick-label">Day</span>
+            <span class="days-sick-value" id="daysSickValue">0</span>
+            <span class="last-sick-label">Last sickness:</span>
+            <span class="last-sick-value" id="lastSickValue"></span>
         </header>
         <section id="goodUI">
             <div class="layout layout-row2 layout-center">
@@ -34,9 +34,9 @@
                 <div class="p1">
                     <div class="layout layout-col2 layout-gap">
                         <form action="./pages/history.html">
-                            <input type="submit" name="old" value="i was sick"/>
+                            <input class="btn" type="submit" name="old" value="i was sick"/>
                         </form>
-                        <input type="button" name="new" value="i feel sick" onclick="dbCreateEvent()" />
+                        <input class="btn color-red" type="button" name="new" value="i feel sick" onclick="dbCreateEvent()" />
                     </div>
                 </div>
             </div>
@@ -60,8 +60,8 @@
                 </div>                
                 <div class="container pt2">
                     <div class="layout layout-col2 layout-gap">
-                        <input type="button" name="cancel" value="False alarm" onclick="dbCancelEvent()" />
-                        <input type="button" name="save" value="All better" onclick="dbCompleteEvent()"  />
+                        <input class="btn" onclick="dbCancelEvent()" value="false alarm" />
+                        <input class="btn color-green" onclick="dbCompleteEvent()" value="all better"/>
                     </div>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                 <template id="templateSymItem">
                     <div data-index="0" class="lined-rows layout layout-col2 layout-center">
                        <span class="row-label">{name}</span>
-                       <span class="row-image material-symbols-outlined" onclick="dbDeleteSymptom(this)">delete</span>
+                       <span class="row-image material-symbols-outlined color-red" onclick="dbDeleteSymptom(this)">delete</span>
                     </div>
                 </template>
                
@@ -88,7 +88,7 @@
                 <template id="templateMedItem">
                     <div data-index="0" class="lined-rows layout layout-col2 layout-center">
                        <span class="row-label">{name}</span>
-                       <span class="row-image material-symbols-outlined" onclick="dbDeleteMedication(this)">delete</span>
+                       <span class="row-image material-symbols-outlined color-red" onclick="dbDeleteMedication(this)">delete</span>
                    </div>
                </template>
            </div>
@@ -221,7 +221,7 @@
             dbUpdateEvent()
             uiUpdateJournal()
             var crntColor = btn.style.color;
-            btn.style.color = "var(--color-success)";
+            btn.style.color = "#0c4";
             setTimeout(()=> btn.style.color = crntColor, 1500)
         }
         
@@ -308,14 +308,14 @@
             var first = dbCurrentEvent.entries[0].date
             var today = new Date()
             today.setHours(0,0,0,0)
-            var days = (today.getTime() - first.getTime()) / (1000 * 3600 * 24)
+            var days = Math.trunc((today.getTime() - first.getTime()) / (1000 * 3600 * 24))
             document.getElementById('lastSickValue').innerText = first.toDateString()
             
             var daysSickElem = document.getElementById('daysSickValue')
             daysSickElem.innerText = days
-            daysSickElem.classList.remove('text-worse')
-            daysSickElem.classList.remove('text-better')
-            daysSickElem.classList.add('text-' + (dbCurrentEvent.better ? 'better': 'worse'))
+            daysSickElem.classList.remove('color-red')
+            daysSickElem.classList.remove('color-green')
+            daysSickElem.classList.add((dbCurrentEvent.better ? 'color-green': 'color-red'))
             
         }
         
