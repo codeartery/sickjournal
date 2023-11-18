@@ -22,7 +22,6 @@
         <header>
             <span class="days-sick-label">Day</span>
             <span class="days-sick-value" id="daysSickValue">0</span>
-            <span class="last-sick-label">Last sickness:</span>
             <span class="last-sick-value" id="lastSickValue"></span>
         </header>
         <section id="goodUI">
@@ -58,10 +57,10 @@
                         <span class="mood-label">better</span>
                     </div>
                 </div>                
-                <div class="container pt2">
-                    <div class="layout layout-col2 layout-gap">
+                <div class="pt3">
+                    <div class="layout layout-gap">
+                        <input class="btn" onclick="dbCompleteEvent()" value="all better"/>
                         <input class="btn" onclick="dbCancelEvent()" value="false alarm" />
-                        <input class="btn color-green" onclick="dbCompleteEvent()" value="all better"/>
                     </div>
                 </div>
             </div>
@@ -305,11 +304,20 @@
         
         function uiUpdateDays() {
             
-            var first = dbCurrentEvent.entries[0].date
             var today = new Date()
             today.setHours(0,0,0,0)
-            var days = Math.trunc((today.getTime() - first.getTime()) / (1000 * 3600 * 24))
-            document.getElementById('lastSickValue').innerText = first.toDateString()
+            var start = today
+            
+            if (dbCurrentEvent.better) {
+                start = dbCurrentEvent.entries[dbCurrentEvent.entries.length -1].date
+            }
+            else {
+                start = dbCurrentEvent.entries[0].date    
+            }
+
+            
+            var days = Math.trunc((today.getTime() - start.getTime()) / (1000 * 3600 * 24))
+            document.getElementById('lastSickValue').innerText = start.toDateString()
             
             var daysSickElem = document.getElementById('daysSickValue')
             daysSickElem.innerText = days

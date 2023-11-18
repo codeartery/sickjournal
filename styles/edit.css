@@ -15,24 +15,25 @@ table {
     font-size: 0.8rem;
     text-align: left;    
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 20px #eee;
+    border-radius: 20px;
     margin: 10px auto;
     margin-top: 0;
 } 
 
 table th {
     font-weight: bold;
-    padding: 20px 10px;    
+    padding: 25px 10px;    
     text-transform: uppercase;
     letter-spacing: 1px;
-    border-bottom: 2px solid #ddd;
+}
+
+table tr {
+    border-bottom: 1px solid #eee;
 }
 
 table tr td {
-    padding: 15px 10px;
-}
-table tr:nth-child(even) td {
-  border-bottom: 1px solid #eee;
+    padding: 15px 10px;    
 }
 
 table tr:hover td {
@@ -85,4 +86,5 @@ input[type="date"] {
 
 nav .btn {
     padding: 10px;
+    margin: 15px 0;
 }
