@@ -49,8 +49,7 @@ dialog {
     border: none !important;
     border-radius: 25px;
     box-shadow: 0 0 #000, 0 0 #000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    margin: 4rem auto;
-    padding: 1rem 2rem;
+    margin: 4rem auto;    
     min-width: 400px;
 }
 
@@ -58,9 +57,13 @@ dialog::backdrop {
     background-color: rgba(0,0,0,0.7);
 }
 
+dialog > h2,
 dialog > div {
     display: flex;
     justify-content: space-between;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
 }
 
 dialog > form {
@@ -68,7 +71,9 @@ dialog > form {
     gap: 1rem;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(4, 1fr);
-    padding: 40px 0;
+    padding: 40px 20px;
+    max-height: 50vh;
+    overflow: scroll;
 }
 
 dialog > form > label {
@@ -87,4 +92,39 @@ input[type="date"] {
 nav .btn {
     padding: 10px;
     margin: 15px 0;
+}
+
+.itemContainer {
+  grid-column: span 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-self: start;
+  align-items: flex-start; 
+  background-color: #f2f2f2;
+  padding: 10px; 
+  border-radius: 5px;
+  font-size: 0.6rem;
+}
+
+.listItem {
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  position: relative;
+}
+
+.removeItem {
+  margin-left: 5px;
+  color: #aaa;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.addItemInput {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-bottom: 10px;
 }

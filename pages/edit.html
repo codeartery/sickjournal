@@ -35,10 +35,13 @@
                 </select>
                 
                 <label for="diagSyms">Symptoms:</label>
-                <input type="text" name="diagSyms"/>
+                <input type="text" name="diagSyms" class="addItemInput" id="symptomInput" placeholder="Add a symptom" list="symptomSuggestions" onkeydown="handleSymptomKeyDown(event)">
+                <div class="itemContainer" id="symptomList" onclick="this.previousElementSibling.focus()"></div>
                 
                 <label for="diagMeds">Medications:</label>
-                <input type="text" name="diagMeds"/>
+                <input type="text" name="diagMeds" class="addItemInput" id="medicationInput" placeholder="Add a medication" oninput="updateMedicationSuggestions()" list="medicationSuggestions" onkeydown="handleMedicationKeyDown(event)">                
+                <div class="itemContainer" id="medicationList" onclick="this.previousElementSibling.focus()"></div>
+      
             </form>
             <div>
                 <button class="btn color-green" onclick="uiSaveEntryEdit()"><span>save</span><span class="material-symbols-outlined">save</span></button>
@@ -66,7 +69,7 @@
                     <template id="templateEntryItem">
                         <tr data-index="0" onclick="uiShowEntryEdit(this.dataset.index)">
                             <td class="row-date">yyyy-MM-dd</td>
-                            <td class="row-summary">feeling {mood} with {symptomn-list} taking {medication-list}</td>                            
+                            <td class="row-summary">feeling mood with syms</td>                            
                         </tr>
                     </template>
                 </tbody>
@@ -80,6 +83,144 @@
         <button class="btn" onclick="uiCancelEdits()"><span class="material-symbols-outlined">cancel</span></button>
     </nav>
         
+    <datalist id="symptomSuggestions">
+      <!-- Suggestions will be dynamically added here -->
+    </datalist>
+    
+    <datalist id="medicationSuggestions">
+      <!-- Suggestions will be dynamically added here -->
+    </datalist>
+    
+    <script>
+    const symptomList = [];
+    const medicationList = [];
+    const fullSymptomSuggestions = [
+      "Fever",
+      "Dizzy",
+      "Nausea",
+      "Headache",
+      "Runny nose",
+      "Stuffy nose",
+      "Cough",
+      "Itchy throat",
+      "Sore throat",
+      "Wheezy",
+      "Fatigue",
+      "Chills"
+      // Add more symptoms as needed
+    ];
+    const fullMedicationSuggestions = [
+        "Aspirin",  
+        "Ibuprofen",
+        "Benadryl",    
+        "DayQuil/NyQuil"
+        // Add more medications as needed
+    ];
+    
+    function addSymptom(symptomText) {        
+        if (symptomText == "") {
+            return; 
+        }
+        const symptomItemList = document.getElementById("symptomList");
+        
+        if (!symptomList.includes(symptomText)) {
+            const listItem = document.createElement("div");
+            listItem.className = "listItem";
+            listItem.innerHTML = `${symptomText} <span class="removeItem" onclick="removeSymptom(this)">x</span>`;
+            symptomItemList.appendChild(listItem);    
+            symptomList.push(symptomText);
+            updateSymptomSuggestions();
+        }        
+    }
+
+    function removeSymptom(element) {
+        const listItem = element.parentNode;
+        const symptomItemList = listItem.parentNode;
+        symptomItemList.removeChild(listItem);
+        
+        // Remove the symptom from the list
+        const symptomText = listItem.textContent.trim().slice(0, -1).trim(); // Remove 'x'
+        const index = symptomList.indexOf(symptomText);
+        if (index !== -1) {
+            symptomList.splice(index, 1);        
+            updateSymptomSuggestions();
+        }
+    }
+      
+    function handleSymptomKeyDown(event) {
+      const input = document.getElementById("symptomInput");
+
+      if (event.key === "Enter" || event.key === "," || event.key === "Tab") {
+        event.preventDefault(); // Prevent default behavior (e.g., newline for Enter)
+        addSymptom(input.value.trim());
+        input.value = "";
+      }      
+    }
+    
+    function updateSymptomSuggestions() {
+        const datalist = document.getElementById("symptomSuggestions");
+        const filteredSuggestions = fullSymptomSuggestions.filter(suggestion => !symptomList.includes(suggestion.toUpperCase()));
+        updateDatalist(datalist, filteredSuggestions);
+    }
+    
+    function addMedication(medicationText) {
+        if (medicationText == "") {
+            return; 
+        }
+        const medicationItemList = document.getElementById("medicationList");
+        
+        // Check if the item is already in the list
+        if (!medicationList.includes(medicationText)) {
+            const listItem = document.createElement("div");
+            listItem.className = "listItem";
+            listItem.innerHTML = `${medicationText} <span class="removeItem" onclick="removeMedication(this)">x</span>`;
+            medicationItemList.appendChild(listItem);    
+            medicationList.push(medicationText);
+            updateMedicationSuggestions();
+        }        
+    }
+    
+    function removeMedication(element) {
+        const listItem = element.parentNode;
+        const medicationItemList = listItem.parentNode;
+        medicationItemList.removeChild(listItem);
+        
+        // Remove the item from the list
+        const medicationText = listItem.textContent.trim().slice(0, -1).trim(); // Remove 'x'
+        const index = medicationList.indexOf(medicationText);
+        if (index !== -1) {
+            medicationList.splice(index, 1);
+            updateMedicationSuggestions();
+        }
+    }
+    
+    function handleMedicationKeyDown(event) {
+      const input = document.getElementById("medicationInput");
+
+      if (event.key === "Enter" || event.key === "," || event.key === "Tab") {
+        event.preventDefault(); // Prevent default behavior (e.g., newline for Enter)
+        addMedication(input.value.trim());
+        input.value = "";
+      }      
+    }
+    
+    function updateMedicationSuggestions() {
+        const datalist = document.getElementById("medicationSuggestions");
+        const filteredSuggestions = fullMedicationSuggestions.filter(suggestion => !medicationList.includes(suggestion.toUpperCase()));
+        updateDatalist(datalist, filteredSuggestions);
+    }
+    
+    function updateDatalist(datalist, suggestions) {
+      datalist.innerHTML = "";
+      suggestions.forEach(suggestion => {
+        const option = document.createElement("option");
+        option.value = suggestion.toUpperCase();
+        datalist.appendChild(option);
+      });
+    }
+    
+  </script>
+    
     <script>
         
         dbConnection.onsuccess = (event) => {
@@ -148,11 +289,13 @@
             for (let i = 0; i < items.length; i++) {                
                 var item = templateItem.content.cloneNode(true)
                 var mood = items[i].feeling
-                var syms = items[i].symptoms.join(',')
-                var meds = items[i].medications.join(',')
+                var syms = '"' + items[i].symptoms.join('", "') + '"'
+                var meds = '"' + items[i].medications.join('", "') + '"'
                 item.querySelector('tr').dataset.index = i
                 item.querySelector('.row-date').innerText = items[i].date.toDateString()
-                item.querySelector('.row-summary').innerText = `feeling ${mood}${syms.length > 0 ? ', with symptoms: ' : ''}${syms}${meds.length > 0 ? '. taking: ' : ''}${meds}.`
+                
+                var sum = item.querySelector('.row-summary').innerText;
+                item.querySelector('.row-summary').innerText = sum.replace(/mood/, mood).replace(/syms/, syms);
                 templateContainer.appendChild(item);
             }
         }
@@ -200,13 +343,18 @@
                 diagDate.valueAsDate = (withDate == null) ? entry.date : withDate
                 diagMood.querySelectorAll('option').forEach(mood => {mood.selected = false})
                 diagMood.querySelectorAll(`option[value="${entry.feeling}"]`).selected = true
-                diagSyms.value = entry.symptoms.join()
-                diagMeds.value = entry.medications.join()                
+                //diagSyms.value = entry.symptoms.join()
+                //diagMeds.value = entry.medications.join()                
+                entry.symptoms.forEach(x => { addSymptom(x); });
+                entry.medications.forEach(x => { addMedication(x); });                
             }
             
             if (diag.open == false) {
                 diag.showModal()
             }
+            
+            updateSymptomSuggestions();
+            updateMedicationSuggestions();
         }
         
         function uiCancelEntryEdit() {
@@ -258,8 +406,10 @@
             diag.dataset.mode = "edit"
             entry.date = new Date(diagDate.value.replaceAll('-', '/'))
             entry.feeling = diagMood.value
-            entry.symptoms = diagSyms.value.split(',')
-            entry.medications = diagMeds.value.split(',')
+            //entry.symptoms = diagSyms.value.split(',')
+            //entry.medications = diagMeds.value.split(',')
+            entry.symptoms = symptomList;
+            entry.medications = medicationList;
             
             dbCurrentEvent.entries.sort((a,b)=>a.date.getTime()-b.date.getTime());
             dbCurrentEvent.entries[0].feeling = 'worse'
