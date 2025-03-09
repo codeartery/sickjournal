@@ -1,9 +1,9 @@
 {
-  "name": "Sick Journal",
-  "short_name": "Sick Journal",
-  "description": "An offline PWA for journaling sickness.",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#fff",
-  "theme_color": "#fff"
+    "name": "Sick Track",
+    "short_name": "SickTrack",
+    "description": "PWA for tracking sickness",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff"
 }

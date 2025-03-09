@@ -1,398 +1,233 @@
-<html>
-<head>
-    <title>Sick Journal: Current</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="apple-touch-icon" href="./icons/touch-icon-x256.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="./icons/touch-icon-x152.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="./icons/touch-icon-x167.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./icons/touch-icon-x180.png">
-    <link rel="stylesheet" href="./styles/global.css" />
-    <link rel="stylesheet" href="./styles/index.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-    <link rel="apple-touch-icon" href="/icons/ios.png">
+<!DOCTYPE html>
+<html lang="en">
+<head>    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes"></meta>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"></meta>
+    <meta name="color-scheme" content="light" />
     
-    <script type="text/javascript" src="./database.js"></script>
+    <title>SickTrack</title>
+    
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./serviceworker.js')
+            navigator.serviceWorker.register('./script-sw.js')
         }
     </script>
-    
+   
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <!-- TODO: offline version -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
 <body>
+    <dialog id="diag_confirm_event_start">
+        <b>Confirm:</b>
+        <hr class="diag-confirm-separator" />
+        <p>Feeling sick or was sick? This will create a new or old event.</p>
+        <div>
+            <button class="fgcolor-green" data-page=".page-home" data-pagestate=".pagestate-sick" onclick="startEvent(this)"><span class="material-symbols-outlined">add</span>New event</button>
+            <button class="fgcolor-black" onclick="closeConfirmEventStart()"><span class="material-symbols-outlined">close</span>Cancel</button>
+        </div>
+    </dialog>
+    <dialog id="diag_confirm_event_end">
+        <b>Confirm:</b>
+        <hr class="diag-confirm-separator" />
+        <p>Feeling better or false alarm? This will end or delete this event.</p>
+        <div>
+            <button class="fgcolor-green" data-page=".page-home" data-pagestate=".pagestate-healthy" onclick="endEvent(this)"><span class="material-symbols-outlined">save</span>End event</button>
+            <button class="fgcolor-red" data-page=".page-home" data-pagestate=".pagestate-healthy" onclick="deleteEvent(this)"><span class="material-symbols-outlined">delete</span>Delete event</button>
+            <button class="fgcolor-black" onclick="closeConfirmEventEnd()"><span class="material-symbols-outlined">close</span>Cancel</button>
+        </div>
+    </dialog>
+    <dialog id="diag_confirm_event_edit">
+        <b>Confirm:</b>
+        <hr class="diag-confirm-separator" />
+        <p>Save entry changes or delete entry?</p>        
+        <div>
+            <button class="fgcolor-green" onclick="saveEntry()"><span class="material-symbols-outlined">save</span>Save</button>
+            <button class="fgcolor-red" onclick="deleteEntry()"><span class="material-symbols-outlined">delete</span>Delete</button>
+            <button class="fgcolor-black" onclick="closeConfirmEventEdit()"><span class="material-symbols-outlined">close</span>Cancel</button>
+        </div>
+    </dialog>
     
-    <main>
-        <header>
-            <span class="days-sick-label">Day</span>
-            <span class="days-sick-value" id="daysSickValue">0</span>
-            <span class="last-sick-value" id="lastSickValue">yyyy-MM-dd</span>
-        </header>
-        <section id="goodUI">
-            <div class="layout layout-row2 layout-center">
-                <div class="layout layout-row2 layout-center">
-                    <span class="mood-image material-symbols-outlined">sentiment_very_satisfied</span>
-                    <span class="mood-label">sick free!</span>
-                </div>
-                <div class="p1">
-                    <div class="layout layout-col2 layout-gap">
-                        <form action="./pages/history.html">
-                            <input class="btn" type="submit" name="old" value="i was sick"/>
-                        </form>
-                        <input class="btn color-red" type="button" name="new" value="i feel sick" onclick="dbCreateEvent()" />
+    <header>
+        <section class="page page-home">
+            <div class="home-header">
+                <div class="home-header-actions">                    
+                    <div class="pagestate pagestate-healthy">
+                        <button class="fgcolor-red" onclick="openConfirmEventStart()"><span class="material-symbols-outlined">heart_plus</span>NEW EVENT</button>
                     </div>
+                    <div class="pagestate pagestate-sick">
+                        <button class="fgcolor-green" onclick="openConfirmEventEnd()"><span class="material-symbols-outlined">heart_check</span>END EVENT</button>
+                    </div>
+                    <div class="pagestate pagestate-historic">
+                        <button class="fgcolor-black"><span class="material-symbols-outlined" data-page=".page-hist" onclick="changePage(this)">arrow_back_ios</span></button>
+                    </div>
+                </div>
+                <div class="home-header-status">
+                    <div>Day <span id="home_header_days" class="fgcolor-green">0</span></div>
+                    <input type="date" id="home_header_date" onchange="handleDateChange()" />                    
                 </div>
             </div>
         </section>
-        
-        <section id="sickUI" class="p2">
-            <div class="container">
-                <div class="layout-flex"> 
-                    <div data-mood="worse" class="layout layout-row2 layout-center mood" onclick="dbUpdateMood(this)">
-                        <span class="mood-image material-symbols-outlined">sentiment_dissatisfied</span>
+        <section class="page page-hist">
+            <div class="hist-header">
+                <div class="hist-header-stat" id="hist_header_records">0</div>
+                <div class="hist-header-stat" id="hist_header_average">0</div>
+                <div class="hist-header-stat" id="hist_header_shortest">0</div>
+                <div class="hist-header-stat" id="hist_header_longest">0</div>
+                <div class="hist-header-label">RECORDS</div>
+                <div class="hist-header-label">AVERAGE</div>
+                <div class="hist-header-label">SHORTEST</div>
+                <div class="hist-header-label">LONGEST</div>
+            </div>
+        </section>
+        <section class="page page-sett">
+            <div class="sett-header">
+                <div class="sett-header-title">SETTINGS</div>
+                <div class="sett-header-version">Version 3.0 - @codeartery</div>
+                <div class="sett-header-desc">SickTrack - An offline PWA for journaling and trackinng sickness.</div>
+            </div>
+        </section>
+    </header>    
+    <main>        
+        <section class="page page-home">
+            <div class="pagestate pagestate-healthy">
+                <div class="happy" onmousedown="toggleHappiness()">
+                    <span class="happy-icon material-symbols-outlined">sentiment_satisfied</span>
+                    <span class="happy-label"></span>
+                </div>
+            </div>
+            <div class="pagestate pagestate-sick pagestate-historic">
+                <div class="mood-select">
+                    <div data-mood="-2" class="mood" onclick="changeMood(this)">
+                        <span class="mood-icon material-symbols-outlined">sentiment_very_dissatisfied</span>
+                        <span class="mood-label">dire</span>
+                    </div>
+                    <div data-mood="-1" class="mood" onclick="changeMood(this)">
+                        <span class="mood-icon material-symbols-outlined">sentiment_dissatisfied</span>
                         <span class="mood-label">worse</span>
                     </div>
-                    <div data-mood="same" class="layout layout-row2 layout-center mood" onclick="dbUpdateMood(this)">
-                        <span class="mood-image material-symbols-outlined">sentiment_neutral</span>
+                    <div data-mood="0" class="mood mood-selected" onclick="changeMood(this)">
+                        <span class="mood-icon material-symbols-outlined">sentiment_neutral</span>
                         <span class="mood-label">same</span>
                     </div>
-                    <div data-mood="better" class="layout layout-row2 layout-center mood" onclick="dbUpdateMood(this)">
-                        <span class="mood-image material-symbols-outlined">sentiment_satisfied</span>
+                    <div data-mood="1" class="mood" onclick="changeMood(this)">
+                        <span class="mood-icon material-symbols-outlined">sentiment_satisfied</span>
                         <span class="mood-label">better</span>
                     </div>
-                </div>                
-                <div class="pt3">
-                    <div class="layout layout-gap">
-                        <input class="btn" onclick="dbCompleteEvent()" value="all better"/>
-                        <input class="btn" onclick="dbCancelEvent()" value="false alarm" />
+                    <div data-mood="2" class="mood" onclick="changeMood(this)">
+                        <span class="mood-icon material-symbols-outlined">sentiment_very_satisfied</span>
+                        <span class="mood-label">lively</span>
+                    </div>
+                </div>
+                
+                <div class="items-container">
+                    <div class="items-header">
+                        <b>Symptoms</b>
+                        <input type="text" id="symptom_input" placeholder="Add a symptom" list="symptom_suggestions" onkeydown="handleSymptomKeyDown(event)" />
+                        <button onclick="handleSymptomAdd()"><span class="material-symbols-outlined">add</span></button>
+                    </div>
+                    <div id="symptom_items" class="items"></div>
+                </div>
+                
+                <div class="items-container">
+                    <div class="items-header">
+                        <b>Medications</b>
+                        <input type="text" id="medication_input" placeholder="Add a medication" list="medication_suggestions" onkeydown="handleMedicationKeyDown(event)" />
+                        <button onclick="handleMedicationAdd()"><span class="material-symbols-outlined">add</span></button>
+                    </div>
+                    <div id="medication_items" class="items"></div>
+                </div>
+                
+                <div class="items-container">
+                    <div class="items-header">
+                        <b>Journal</b>
+                        <button onclick="handleJournalSave(this)"><span class="material-symbols-outlined">save</span></button>
+                    </div>
+                    <div class="items">
+                       <textarea id="journal_input" oninput="adjustJournalTypingArea(this)" placeholder="Details here..."></textarea>
                     </div>
                 </div>
             </div>
-            
-            <div class="p1 pt2">
-                <div class="lined-rows layout layout-col2 layout-center">
-                    <span class="row-header">symptoms</span>
-                    <span class="row-image material-symbols-outlined" onclick="dbAddSymptom()">add</span>
-                </div>                
-                <template id="templateSymItem">
-                    <div data-index="0" class="lined-rows layout layout-col2 layout-center">
-                       <span class="row-label">{name}</span>
-                       <span class="row-image material-symbols-outlined color-red" onclick="dbDeleteSymptom(this)">delete</span>
-                    </div>
-                </template>
-               
-            </div>
-            
-            <div class="p1 pt2">
-                <div class="lined-rows layout layout-col2 layout-center">
-                    <span class="row-header">medications</span>
-                    <span class="row-image material-symbols-outlined" onclick="dbAddMedication()">add</span>
-                </div>
-                <template id="templateMedItem">
-                    <div data-index="0" class="lined-rows layout layout-col2 layout-center">
-                       <span class="row-label">{name}</span>
-                       <span class="row-image material-symbols-outlined color-red" onclick="dbDeleteMedication(this)">delete</span>
-                   </div>
-               </template>
-           </div>
-           
-           <div class="p1 pt2">
-                <div class="lined-rows layout layout-col2 layout-center">
-                    <span class="row-header">journal</span>
-                    <span class="row-image material-symbols-outlined" onclick="dbSaveJournal(this)">save</span>
-                </div>
-                <div>
-                   <textarea id="journalText"></textarea>
-               </div>
-           </div>
         </section>
+        <section class="page page-hist" id="historical_items">
+            <div class="entries-container">
+                <div class="entries-header">
+                    <div class="entries-label">
+                        <div class="entries-desc">13 day sickness</div>
+                        <div class="entries-date">ddd mmm dd yyyy</div>
+                    </div>
+                    <button class="entries-add bgcolor-green material-symbols-outlined" onclick="addEntry(this)">add</button>
+                    <button class="entries-expand bgcolor-black material-symbols-outlined" onclick="expandEntries(this)">expand_more</button>
+                </div>
+                <div class="entries"></div>
+            </div>            
+        </section>
+        <section class="page page-sett">
+            TODO: Database import/export
+            <br>
+            TODO: Enable notifications
+            <br>
+            TODO: Dark/light theme toggle
+        </section>        
     </main>
     <nav>
-        <a href="./index.html" class="nav-active"><span class="material-symbols-outlined">thermostat</span></a>
-        <a href="./pages/history.html"><span class="material-symbols-outlined">auto_stories</span></a>
-        <a href="./pages/settings.html"><span class="material-symbols-outlined">settings</span></a>
+        <section class="link-select">            
+            <span class="material-symbols-outlined link" data-page=".page-hist" onclick="changePage(this)">auto_stories</span>
+            <span class="material-symbols-outlined link link-selected" data-page=".page-home" onclick="changePage(this)">unknown_2</span>
+            <span class="material-symbols-outlined link" data-page=".page-sett" onclick="changePage(this)">settings_account_box</span>
+        </section>
     </nav>
     
-    <script>
-        
-        dbConnection.onsuccess = (event) => {
-            console.log('Successfully opened DB', dbConnection.result)
-            uiUpdate()
-        }
-        
-        dbConnection.onerror = (event) => {
-            console.log('Failed to open DB', dbConnection.error)
-        }
-        
-        function dbCreateEvent() {
-            const db = dbConnection.result;
-            const tr = db.transaction(db.objectStoreNames, 'readwrite')
-            
-            const store = tr.objectStore('sickevent')
-            
-            /*//note: clear database
-            store.getAll().onsuccess = (event) => {
-                event.target.result.forEach(item => {store.delete(item.id)})
-            }
-            */
-            
-            const today = new Date()
-            today.setHours(0,0,0,0)
-            
-            const store_add = store.add({
-                better: false,
-                journal: "",
-                entries: [{
-                    date: today,
-                    feeling: 'worse',
-                    symptoms: [],
-                    medications: []
-                }]
-            })
-            
-            store_add.onsuccess = (event) => {
-                uiUpdate();                
-            }
-        }
-        
-        function dbUpdateEvent() {            
-            const db = dbConnection.result;
-            const tr = db.transaction(db.objectStoreNames, 'readwrite')
-            const store = tr.objectStore('sickevent')
-            store.put(dbCurrentEvent)
-        }
-        
-        function dbCancelEvent() {            
-            if (confirm('This will delete this sick event.') == false) {
-                return
-            }            
-            const db = dbConnection.result;
-            const tr = db.transaction(db.objectStoreNames, 'readwrite')            
-            const store = tr.objectStore('sickevent')            
-            store.delete(dbCurrentEvent.id)
-            uiUpdate()
-        }
-        
-        function dbCompleteEvent() {
-            if (confirm('This will stop this sick event.') == false) {
-                return
-            }          
-            dbCurrentEvent.better = true
-            dbUpdateEvent()
-            uiUpdate()
-        }
-        
-        function dbUpdateMood(item) {            
-            dbCurrentEvent.entries[dbCurrentEventEntryIndex].feeling = item.dataset.mood
-            dbUpdateEvent()
-            uiUpdateMoods()            
-        }
-        
-        function dbAddSymptom() {            
-            var userInput = prompt('New Symptom:')
-            if (userInput.length > 0) {                
-                dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms.push(userInput)
-                dbUpdateEvent()
-                uiUpdateSymptoms()            
-            }
-        }
-        
-        function dbDeleteSymptom(item) {
-            dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms.splice(item.parentElement.dataset.index, 1)
-            dbUpdateEvent()
-            uiUpdateSymptoms()
-        }
-        
-        function dbAddMedication() {            
-            var userInput = prompt('New Medication:')
-            if (userInput.length > 0) {                
-                dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications.push(userInput)
-                dbUpdateEvent()
-                uiUpdateMedications()            
-            }
-        }
-        
-        function dbDeleteMedication(item) {
-            dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications.splice(item.parentElement.dataset.index, 1)            
-            dbUpdateEvent()
-            uiUpdateMedications()
-        }
-        
-        function dbSaveJournal(btn) {   
-            var txtArea = document.getElementById('journalText')         
-            dbCurrentEvent.journal = txtArea.value            
-            dbUpdateEvent()
-            uiUpdateJournal()
-            var crntColor = btn.style.color;
-            btn.style.color = "#0c4";
-            setTimeout(()=> btn.style.color = crntColor, 1500)
-        }
-        
-        function dbGetEntryAsync(forDate) {            
-            return new Promise((resolve, reject) => {                
-                const db = dbConnection.result;
-                const tr = db.transaction(db.objectStoreNames, 'readonly')
-                const store = tr.objectStore('sickevent')
-                store.getAll().onsuccess = (event) => {
-                    const rows = event.target.result
-                    var found = false
-                    rows.forEach(row => {
-                        row.entries.forEach((entry, index) => {                            
-                            if (entry.date.getTime() == forDate.getTime() && row.better == false) {
-                                found = true
-                                resolve({dbEvent: row, dbEntryIndex: index})
-                            }
-                        })
-                        if (found == false && row.better == false) {
-                            found = true
-                            var today = new Date()
-                            today.setHours(0,0,0,0)
-                            row.entries.push({
-                                date: today,
-                                feeling: 'same',
-                                symptoms: [],
-                                medications: []
-                            })
-                            resolve({dbEvent: row, dbEntryIndex: row.entries.length - 1})
-                        }
-                    })
-                    if (found == false) {
-                        if (rows.length > 0) {
-                            var last = rows[rows.length - 1]                          
-                            resolve({dbEvent: last, dbEntryIndex: 0})
-                        }
-                        else {                        
-                            reject()
-                        }
-                    }
-                }
-            })
-        }
-        
-        function uiUpdate() {
-            
-            const today = new Date()
-            today.setHours(0,0,0,0)
-            
-            dbGetEntryAsync(today)
-                .then((result) => {
-                    dbCurrentEvent = result.dbEvent
-                    dbCurrentEventEntryIndex = result.dbEntryIndex
-                    
-                    uiUpdateDays()
-                    
-                    if (dbCurrentEvent.better == true) {
-                        dbCurrentEvent = null
-                        dbCurrentEventEntryIndex = -1
-                        document.getElementById('goodUI').style.display = 'block'
-                        document.getElementById('sickUI').style.display = 'none'
-                        return
-                    }
-                    
-                    uiUpdateMoods()
-                    uiUpdateSymptoms()
-                    uiUpdateMedications()
-                    uiUpdateJournal()
-                                        
-                    document.getElementById('goodUI').style.display = 'none'
-                    document.getElementById('sickUI').style.display = 'block'
-                })
-                .catch(() => {
-                    dbCurrentEvent = null
-                    dbCurrentEventEntryIndex = -1
-                    document.getElementById('goodUI').style.display = 'block'
-                    document.getElementById('sickUI').style.display = 'none'
-                })
-                
-        }
-        
-        function uiUpdateDays() {
-            
-            var today = new Date()
-            today.setHours(0,0,0,0)
-            var start = today
-            
-            if (dbCurrentEvent.better) {
-                start = dbCurrentEvent.entries[dbCurrentEvent.entries.length -1].date
-            }
-            else {
-                start = dbCurrentEvent.entries[0].date    
-            }
-
-            
-            var days = Math.trunc((today.getTime() - start.getTime()) / (1000 * 3600 * 24))
-            document.getElementById('lastSickValue').innerText = start.toDateString()
-            
-            var daysSickElem = document.getElementById('daysSickValue')
-            daysSickElem.innerText = days
-            daysSickElem.classList.remove('color-red')
-            daysSickElem.classList.remove('color-green')
-            daysSickElem.classList.add((dbCurrentEvent.better ? 'color-green': 'color-red'))
-            
-        }
-        
-        function uiUpdateMoods() {
-            
-            var dataMoods = document.querySelectorAll('#sickUI [data-mood]')
-            var entry = dbCurrentEvent.entries[dbCurrentEventEntryIndex]
-            
-            dataMoods.forEach(mood => {
-                mood.classList.remove('mood-active')
-                
-                if (mood.dataset.mood == entry.feeling) {
-                    mood.classList.add('mood-active')                    
-                }
-                else if (dbCurrentEventEntryIndex <= 0) {
-                    mood.style.display = 'none';                
-                }
-            })
-            
-        }
-        
-        function uiUpdateSymptoms() {
-
-            var templateItem = document.getElementById('templateSymItem')
-            var templateContainer = templateItem.parentElement
-            
-            while(templateContainer.lastElementChild.hasAttribute('data-index')) {
-                templateContainer.removeChild(templateContainer.lastChild)
-            }
-            
-            var items = dbCurrentEvent.entries[dbCurrentEventEntryIndex].symptoms
-            
-            for (let i = 0; i < items.length; i++) {                
-                var item = templateItem.content.cloneNode(true)
-                item.querySelector('div').dataset.index = i
-                item.querySelector('.row-label').innerText = items[i];
-                templateContainer.appendChild(item);
-            }
-        }
-        
-        function uiUpdateMedications() {
-
-            var templateItem = document.getElementById('templateMedItem')
-            var templateContainer = templateItem.parentElement
-            
-            while(templateContainer.lastElementChild.hasAttribute('data-index')) {
-                templateContainer.removeChild(templateContainer.lastChild)
-            }
-            
-            var items = dbCurrentEvent.entries[dbCurrentEventEntryIndex].medications
-            
-            for (let i = 0; i < items.length; i++) {                
-                var item = templateItem.content.cloneNode(true)
-                item.querySelector('div').dataset.index = i
-                item.querySelector('.row-label').innerText = items[i];
-                templateContainer.appendChild(item);
-            }        
-        }
-        
-        function uiUpdateJournal() {         
-            var txtArea = document.getElementById('journalText')         
-            txtArea.value = dbCurrentEvent.journal            
-        }
-        
-    </script>
+    <template id="history_entries">
+        <div class="entries-container" data-id="-1">
+            <div class="entries-header">
+                <div class="entries-label">
+                    <div class="entries-desc">x day sickness</div>
+                    <div class="entries-date">ddd mmm dd yyyy</div>
+                </div>
+                <button class="entries-add bgcolor-green material-symbols-outlined" onclick="addEntry(this)">add</button>
+                <button class="entries-expand bgcolor-black material-symbols-outlined" onclick="expandEntries(this)">expand_more</button>
+            </div>
+            <div class="entries">
+                <!-- history_entry template -->
+            </div>
+        </div>  
+    </template>
+    
+    <template id="history_entry">
+        <div class="entry" data-index="-1">
+            <div class="entry-date">ddd mmm dd yyyy</div>
+            <button class="entry-edit bgcolor-red material-symbols-outlined" data-page=".page-home" data-pagestate=".pagestate-historic" onclick="changePage(this)">edit</button>
+        </div>  
+    </template>
+    
+    <template id="symptom_item">
+        <div class="item bgcolor-red">
+            <span class="item-value">item</span>
+            <span class="item-delete material-symbols-outlined" onclick="deleteSymptom(this)">close</span>
+        </div>
+    </template>
+    
+    <template id="medication_item">
+        <div class="item bgcolor-green">
+            <span class="item-value">item</span>
+            <span class="item-delete material-symbols-outlined" onclick="deleteMedication(this)">close</span>
+        </div>
+    </template>
+    
+    <datalist id="symptom_suggestions">
+      <!-- suggestions will be dynamically added here -->
+    </datalist>
+    
+    <datalist id="medication_suggestions">
+      <!-- suggestions will be dynamically added here -->
+    </datalist>
+    
+    <script src="./script-ui.js"></script>
+    <script src="./script-db.js"></script>
     
 </body>
 </html>

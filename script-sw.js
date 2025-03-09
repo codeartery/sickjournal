@@ -1,5 +1,5 @@
 
-const cacheName = 'pwa-assets'
+const cacheName = 'sicktrackcache'
 
 self.addEventListener('install', e => {
     e.waitUntil(
@@ -8,20 +8,13 @@ self.addEventListener('install', e => {
                 '/', 
                 '/manifest.json',
                 '/index.html',
-                '/database.js',
-                '/serviceworker.js',                
-                '/pages/edit.html',
-                '/pages/history.html',
-                '/pages/settings.html',
-                '/styles/global.css', 
-                '/styles/index.css',
-                '/styles/edit.css',
-                '/styles/history.css',
-                
+                '/style.css',
+                '/script-ui.js',
+                '/script-db.js',
+                '/script-sw.js'                
             ])
         })
     )
-    console.log('service worker installed')
 })
 
 
@@ -35,6 +28,7 @@ self.addEventListener('fetch', event => {
                 return response
             })
             return networkResponse || cacheResponse
+            //TODO: cache then network? but then I'd need a refresh cycle
         })
     )
 })
