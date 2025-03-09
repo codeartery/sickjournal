@@ -59,10 +59,8 @@ function dbGetEntryAsync(forDate) {
                 })
                 if (found == false && row.better == false) {
                     found = true
-                    var today = new Date()
-                    //today.setHours(0,0,0,0)
                     row.entries.push({
-                        date: today,
+                        date: forDate,
                         feeling: 0,
                         symptoms: [], //TODO: carry over from prev entry?
                         medications: []

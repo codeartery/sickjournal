@@ -25,7 +25,7 @@ body {
     font-size: 1.1rem;
     margin: 0 auto;
     max-width: 400px;
-    -webkit-user-select: none;
+    user-select: none;
 }
 
 header {
@@ -148,6 +148,11 @@ header .page-home {
 .home-header-status-date > button {
     margin: 0 2px;
     padding: 0 3px;
+}
+
+#home_header_entries {
+    font-size: 0.7rem;
+    margin-top: 10px;
 }
 
 #home_header_days {
@@ -350,7 +355,7 @@ button {
     align-items: center;
     gap: 5px;
     border-radius: 16px;
-    padding: 5px 10px;
+    padding: 5px;
     text-align: center;
     font-size: 0.8rem;
     font-weight: bold;

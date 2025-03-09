@@ -402,10 +402,6 @@ function deleteEntry(elem) {
 
 function uiUpdate( forDate ) {
     
-    dbGetEntries().then((result) => {
-        uiUpdateHistory(result)
-    })
-    
     dbGetEntryAsync(forDate)
         .then((result) => {
             dbCurrentEvent = result.dbEvent
@@ -414,23 +410,30 @@ function uiUpdate( forDate ) {
             var pagestate = dbCurrentEvent.better ? '.pagestate-healthy' : '.pagestate-sick'           
             changePageState(pagestate)
             
-            uiUpdateDays()
+            uiUpdateDays(forDate)
             uiUpdateMoods()
             uiUpdateSymptoms()
             uiUpdateMedications()
             uiUpdateJournal()
             
         })
-        .catch(() => {
+        .catch((e) => {
             dbCurrentEvent = null
             dbCurrentEventEntryIndex = -1   
         })
+        .finally(() => {
+            dbGetEntries().then((result) => {
+                uiUpdateHistory(result)
+            })
+        })
+        
 }
 
-function uiUpdateDays() {
+function uiUpdateDays(forDate) {
     var today = new Date()
     //today.setHours(0,0,0,0)
-    var start = today
+    //var start = today
+    var start = forDate
     if (dbCurrentEvent.better) {
         start = dbCurrentEvent.entries[dbCurrentEvent.entries.length -1].date
     }
@@ -438,8 +441,10 @@ function uiUpdateDays() {
         start = dbCurrentEvent.entries[0].date
     }
     var days = Math.trunc((today.getTime() - start.getTime()) / (1000 * 3600 * 24))
-    document.getElementById('home_header_date').valueAsDate = start;
+    var date = start.toISOString().slice(0, 10)
+    document.getElementById('home_header_date').value = date;
     document.getElementById('home_header_days').innerText = days
+    document.getElementById('home_header_entries').innerText = 'of ' + dbCurrentEvent.entries.length
 }
 
 function uiUpdateMoods() {
