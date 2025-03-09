@@ -98,10 +98,7 @@ function toggleHappiness() {
 }
 
 function handleDateChange() {
-    
-    dbUpdateDate(document.getElementById('home_header_date').valueAsDate)
-    
-
+    openConfirmEntryEdit(false);
 }
 
 function handleSymptomKeyDown(event) {
@@ -230,6 +227,38 @@ function adjustJournalTypingArea(elem) {
     elem.style.height = elem.scrollHeight + 'px'
 }
 
+function openConfirmEntryEdit(forDelete = false) {
+    const diag = document.getElementById('diag_confirm_entry_edit')
+
+    diag.querySelector('p').innerText = forDelete ? 'Delete this entry?' : 'Update or add an entry?'
+    document.getElementById('diag_confirm_entry_edit_add').style.display = forDelete ? 'none' : 'flex'
+    document.getElementById('diag_confirm_entry_edit_update').style.display = forDelete ? 'none' : 'flex'
+    document.getElementById('diag_confirm_entry_edit_delete').style.display = forDelete ? 'flex' : 'none'
+    document.getElementById('diag_confirm_entry_edit_cancel').style.display = forDelete ? 'flex' : 'none'
+
+    if (diag.open == false) {
+        diag.showModal()
+    }
+}
+
+function closeConfirmEntryEdit(animationClass) {
+    const diag = document.getElementById('diag_confirm_entry_edit')
+    const diagSeparator = diag.querySelector('.diag-confirm-separator')
+
+    if (animationClass == undefined) {
+        diag.close()
+        return
+    }
+
+    diagSeparator.classList.add(animationClass)
+    diag.querySelectorAll('button').forEach(e => e.disabled = true)
+    setTimeout(() => {                
+        diag.close()
+        diagSeparator.classList.remove(animationClass)
+        diag.querySelectorAll('button').forEach(e => e.disabled = false)        
+    }, 800)
+}
+
 function openConfirmEventEdit(elem) {
     const diag = document.getElementById('diag_confirm_event_edit')
     if (diag.open == false) {
@@ -331,55 +360,53 @@ function expandEntries(elem) {
 }
 
 function addEntry(elem) {
-    //TODO: use diag_confirm_event_edit for this maybe have a separate diag for editEntry()
     
-    const elemEntries = elem.parentNode.nextElementSibling    
-    const elemTemplate = document.getElementById('history_entry')    
-    const elemItem = elemTemplate.content.cloneNode(true)
+    //TODO: add entry logic
+
+    //TODO: create a new entry if selectedDate not found in entries
+
+    
+    //NOTE: update entry for the date selected in UI. 
+    var selectedDate = document.getElementById('home_header_date').valueAsDate
+    uiUpdate(selectedDate)
+
+    //const elemEntries = elem.parentNode.nextElementSibling    
+    //const elemTemplate = document.getElementById('history_entry')    
+    //const elemItem = elemTemplate.content.cloneNode(true)
     
     // Modify content if needed (e.g., update text content)
-    //const currentDate = new Date().toDateString()
+    //const currentDate = selectedDate.toDateString()
     //const dateElement = elemItem.querySelector('.entry-date')
     //dateElement.textContent = currentDate
     
-    elemEntries.appendChild(elemItem)
-    elemEntries.style.maxHeight = elemEntries.scrollHeight + 'px'
+    //elemEntries.appendChild(elemItem)
+    //elemEntries.style.maxHeight = elemEntries.scrollHeight + 'px'
+    
+    closeConfirmEntryEdit('animate-grow-green')
 }
 
 function saveEntry(elem) {    
-    const diag = document.getElementById('diag_confirm_event_edit')
-    const diagSeparator = diag.querySelector('.diag-confirm-separator')
-    diagSeparator.classList.add('animate-grow-green')
-    diag.querySelectorAll('button').forEach(e => e.disabled = true)
-    setTimeout(() => {                
-        diag.close()
-        diagSeparator.classList.remove('animate-grow-green')
-        diag.querySelectorAll('button').forEach(e => e.disabled = false)        
-    }, 800)
+    
+    //TODO: add any other save entry logic. I'm already saving stuff like symptoms automatically
+    dbUpdateDate(document.getElementById('home_header_date').valueAsDate)
+
+    closeConfirmEntryEdit('animate-grow-blue')
 }
 
 function deleteEntry(elem) {
-    const diag = document.getElementById('diag_confirm_event_edit')
-    const diagSeparator = diag.querySelector('.diag-confirm-separator')
-    diagSeparator.classList.add('animate-grow-red')
-    diag.querySelectorAll('button').forEach(e => e.disabled = true)
-    setTimeout(() => {                
-        diag.close()
-        diagSeparator.classList.remove('animate-grow-red')
-        diag.querySelectorAll('button').forEach(e => e.disabled = false)        
-    }, 800)
+    
+    //TODO: delete entry logic
+
+    closeConfirmEntryEdit('animate-grow-red')
 }
 
-function uiUpdate() {
-
-    const today = new Date()
-    today.setHours(0,0,0,0)
+function uiUpdate( forDate ) {
     
     dbGetEntries().then((result) => {
         uiUpdateHistory(result)
     })
     
-    dbGetEntryAsync(today)
+    dbGetEntryAsync(forDate)
         .then((result) => {
             dbCurrentEvent = result.dbEvent
             dbCurrentEventEntryIndex = result.dbEntryIndex
@@ -398,12 +425,11 @@ function uiUpdate() {
             dbCurrentEvent = null
             dbCurrentEventEntryIndex = -1   
         })
-        
 }
 
 function uiUpdateDays() {
     var today = new Date()
-    today.setHours(0,0,0,0)
+    //today.setHours(0,0,0,0)
     var start = today
     if (dbCurrentEvent.better) {
         start = dbCurrentEvent.entries[dbCurrentEvent.entries.length -1].date
@@ -486,7 +512,7 @@ function uiUpdateHistory(items) {
         for (let e = 0; e < items[i].entries.length; e++) {
             var entry = templateEntry.content.cloneNode(true)
             entry.querySelector('.entry').dataset.index = e
-            entry.querySelector('.entry-date').innerText = items[i].entries[e].date.toDateString()
+            entry.querySelector('.entry-date').innerText = items[i].entries[e].date.toLocaleString()
             item.querySelector('.entries').appendChild(entry)
         }
         

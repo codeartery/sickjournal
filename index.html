@@ -3,7 +3,7 @@
 <head>    
     <meta charset="UTF-8" />
     <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="apple-mobile-web-app-capable" content="yes"></meta>
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"></meta>
     <meta name="color-scheme" content="light" />
     
@@ -24,7 +24,7 @@
     <dialog id="diag_confirm_event_start">
         <b>Confirm:</b>
         <hr class="diag-confirm-separator" />
-        <p>Feeling sick or was sick? This will create a new or old event.</p>
+        <p>Feeling sick or was sick? Create a new event to track it.</p>
         <div>
             <button class="fgcolor-green" data-page=".page-home" data-pagestate=".pagestate-sick" onclick="startEvent(this)"><span class="material-symbols-outlined">add</span>New event</button>
             <button class="fgcolor-black" onclick="closeConfirmEventStart()"><span class="material-symbols-outlined">close</span>Cancel</button>
@@ -43,12 +43,26 @@
     <dialog id="diag_confirm_event_edit">
         <b>Confirm:</b>
         <hr class="diag-confirm-separator" />
-        <p>Save entry changes or delete entry?</p>        
+        <p>Edit event</p>        
+
         <div>
-            <button class="fgcolor-green" onclick="saveEntry()"><span class="material-symbols-outlined">save</span>Save</button>
-            <button class="fgcolor-red" onclick="deleteEntry()"><span class="material-symbols-outlined">delete</span>Delete</button>
-            <button class="fgcolor-black" onclick="closeConfirmEventEdit()"><span class="material-symbols-outlined">close</span>Cancel</button>
-        </div>
+            <button id="diag_confirm_event_edit_add" class="fgcolor-blue" onclick="addEntry()"><span class="material-symbols-outlined">add</span>Add</button>
+            <button id="diag_confirm_event_edit_save" class="fgcolor-green" onclick="saveEntry()"><span class="material-symbols-outlined">save</span>Save</button>
+            <button id="diag_confirm_event_edit_delete" class="fgcolor-red" onclick="deleteEntry()"><span class="material-symbols-outlined">delete</span>Delete</button>
+            <button id="diag_confirm_event_edit_cancel" class="fgcolor-black" onclick="closeConfirmEntryEdit()"><span class="material-symbols-outlined">close</span>Cancel</button>
+        </div>      
+    </dialog>
+    <dialog id="diag_confirm_entry_edit">
+        <b>Confirm:</b>
+        <hr class="diag-confirm-separator" />
+        <p>Edit entry</p>        
+
+        <div>
+            <button id="diag_confirm_entry_edit_update" class="fgcolor-blue" onclick="saveEntry()"><span class="material-symbols-outlined">save</span>Update</button>
+            <button id="diag_confirm_entry_edit_add" class="fgcolor-green" onclick="addEntry()"><span class="material-symbols-outlined">add</span>Add</button>
+            <button id="diag_confirm_entry_edit_delete" class="fgcolor-red" onclick="deleteEntry()"><span class="material-symbols-outlined">delete</span>Delete</button>
+            <button id="diag_confirm_entry_edit_cancel" class="fgcolor-black" onclick="closeConfirmEntryEdit()"><span class="material-symbols-outlined">close</span>Cancel</button>
+        </div>      
     </dialog>
     
     <header>
@@ -66,8 +80,16 @@
                     </div>
                 </div>
                 <div class="home-header-status">
-                    <div>Day <span id="home_header_days" class="fgcolor-green">0</span></div>
-                    <input type="date" id="home_header_date" onchange="handleDateChange()" />                    
+                    <div class="home-header-status-days">
+                        <span>Day</span>
+                        <span id="home_header_days" class="fgcolor-green">0</span>
+                    </div>
+                    <div class="home-header-status-date">
+                        <input type="date" id="home_header_date" onchange="handleDateChange()" />
+                        <button onclick="openConfirmEntryEdit(true)">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>

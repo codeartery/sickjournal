@@ -19,7 +19,10 @@ dbConnection.onupgradeneeded = (event) => {
 }
 
 dbConnection.onsuccess = (event) => {
-    uiUpdate()
+    const today = new Date()
+    //today.setHours(0,0,0,0)
+
+    uiUpdate(today)
 }
 
 dbConnection.onerror = (event) => {
@@ -57,7 +60,7 @@ function dbGetEntryAsync(forDate) {
                 if (found == false && row.better == false) {
                     found = true
                     var today = new Date()
-                    today.setHours(0,0,0,0)
+                    //today.setHours(0,0,0,0)
                     row.entries.push({
                         date: today,
                         feeling: 0,
@@ -93,7 +96,7 @@ function dbStartEvent() {
     */
     
     const today = new Date()
-    today.setHours(0,0,0,0)
+    //today.setHours(0,0,0,0)
     
     dbCurrentEvent = {
         better: false,
@@ -110,7 +113,7 @@ function dbStartEvent() {
     const store_add = store.add(dbCurrentEvent)
     
     store_add.onsuccess = (event) => {
-        uiUpdate()
+        uiUpdate(today)
     }
 }
 
